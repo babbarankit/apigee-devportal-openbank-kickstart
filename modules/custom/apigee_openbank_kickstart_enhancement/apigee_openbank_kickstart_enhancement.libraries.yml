@@ -1,0 +1,17 @@
+secret:
+  version: 1.0
+  css:
+    theme:
+      css/apigee_openbank_kickstart_enhancement.secret.css: {}
+  js:
+    js/apigee_openbank_kickstart_enhancement.secret.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+hash_url:
+  version: 1.0
+  js:
+    js/apigee_openbank_kickstart_enhancement.hash-url.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
