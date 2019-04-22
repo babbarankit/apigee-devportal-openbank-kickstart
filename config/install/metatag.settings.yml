@@ -1,0 +1,5 @@
+entity_type_groups:
+  apidoc:
+    apidoc:
+      basic: basic
+      advanced: advanced
