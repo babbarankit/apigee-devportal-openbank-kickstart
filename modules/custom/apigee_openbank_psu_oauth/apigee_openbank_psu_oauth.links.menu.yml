@@ -1,0 +1,6 @@
+apigee_openbank_psu_oauth.open_bank_settings:
+  title: 'PSU OAuth2 Open Bank Settings'
+  route_name: apigee_openbank_psu_oauth.open_bank_settings
+  description: 'Open Bank Settings'
+  parent: system.admin_config_edge
+  weight: 99
