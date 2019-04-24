@@ -14399,6 +14399,253 @@ return jQuery;
 
 /***/ }),
 
+/***/ "./node_modules/js-base64/base64.js":
+/*!******************************************!*\
+  !*** ./node_modules/js-base64/base64.js ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
+ *  base64.js
+ *
+ *  Licensed under the BSD 3-Clause License.
+ *    http://opensource.org/licenses/BSD-3-Clause
+ *
+ *  References:
+ *    http://en.wikipedia.org/wiki/Base64
+ */
+;(function (global, factory) {
+     true
+        ? module.exports = factory(global)
+        : undefined
+}((
+    typeof self !== 'undefined' ? self
+        : typeof window !== 'undefined' ? window
+        : typeof global !== 'undefined' ? global
+: this
+), function(global) {
+    'use strict';
+    // existing version for noConflict()
+    global = global || {};
+    var _Base64 = global.Base64;
+    var version = "2.5.1";
+    // if node.js and NOT React Native, we use Buffer
+    var buffer;
+    if ( true && module.exports) {
+        try {
+            buffer = eval("require('buffer').Buffer");
+        } catch (err) {
+            buffer = undefined;
+        }
+    }
+    // constants
+    var b64chars
+        = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+    var b64tab = function(bin) {
+        var t = {};
+        for (var i = 0, l = bin.length; i < l; i++) t[bin.charAt(i)] = i;
+        return t;
+    }(b64chars);
+    var fromCharCode = String.fromCharCode;
+    // encoder stuff
+    var cb_utob = function(c) {
+        if (c.length < 2) {
+            var cc = c.charCodeAt(0);
+            return cc < 0x80 ? c
+                : cc < 0x800 ? (fromCharCode(0xc0 | (cc >>> 6))
+                                + fromCharCode(0x80 | (cc & 0x3f)))
+                : (fromCharCode(0xe0 | ((cc >>> 12) & 0x0f))
+                   + fromCharCode(0x80 | ((cc >>>  6) & 0x3f))
+                   + fromCharCode(0x80 | ( cc         & 0x3f)));
+        } else {
+            var cc = 0x10000
+                + (c.charCodeAt(0) - 0xD800) * 0x400
+                + (c.charCodeAt(1) - 0xDC00);
+            return (fromCharCode(0xf0 | ((cc >>> 18) & 0x07))
+                    + fromCharCode(0x80 | ((cc >>> 12) & 0x3f))
+                    + fromCharCode(0x80 | ((cc >>>  6) & 0x3f))
+                    + fromCharCode(0x80 | ( cc         & 0x3f)));
+        }
+    };
+    var re_utob = /[\uD800-\uDBFF][\uDC00-\uDFFFF]|[^\x00-\x7F]/g;
+    var utob = function(u) {
+        return u.replace(re_utob, cb_utob);
+    };
+    var cb_encode = function(ccc) {
+        var padlen = [0, 2, 1][ccc.length % 3],
+        ord = ccc.charCodeAt(0) << 16
+            | ((ccc.length > 1 ? ccc.charCodeAt(1) : 0) << 8)
+            | ((ccc.length > 2 ? ccc.charCodeAt(2) : 0)),
+        chars = [
+            b64chars.charAt( ord >>> 18),
+            b64chars.charAt((ord >>> 12) & 63),
+            padlen >= 2 ? '=' : b64chars.charAt((ord >>> 6) & 63),
+            padlen >= 1 ? '=' : b64chars.charAt(ord & 63)
+        ];
+        return chars.join('');
+    };
+    var btoa = global.btoa ? function(b) {
+        return global.btoa(b);
+    } : function(b) {
+        return b.replace(/[\s\S]{1,3}/g, cb_encode);
+    };
+    var _encode = buffer ?
+        buffer.from && Uint8Array && buffer.from !== Uint8Array.from
+        ? function (u) {
+            return (u.constructor === buffer.constructor ? u : buffer.from(u))
+                .toString('base64')
+        }
+        :  function (u) {
+            return (u.constructor === buffer.constructor ? u : new  buffer(u))
+                .toString('base64')
+        }
+        : function (u) { return btoa(utob(u)) }
+    ;
+    var encode = function(u, urisafe) {
+        return !urisafe
+            ? _encode(String(u))
+            : _encode(String(u)).replace(/[+\/]/g, function(m0) {
+                return m0 == '+' ? '-' : '_';
+            }).replace(/=/g, '');
+    };
+    var encodeURI = function(u) { return encode(u, true) };
+    // decoder stuff
+    var re_btou = new RegExp([
+        '[\xC0-\xDF][\x80-\xBF]',
+        '[\xE0-\xEF][\x80-\xBF]{2}',
+        '[\xF0-\xF7][\x80-\xBF]{3}'
+    ].join('|'), 'g');
+    var cb_btou = function(cccc) {
+        switch(cccc.length) {
+        case 4:
+            var cp = ((0x07 & cccc.charCodeAt(0)) << 18)
+                |    ((0x3f & cccc.charCodeAt(1)) << 12)
+                |    ((0x3f & cccc.charCodeAt(2)) <<  6)
+                |     (0x3f & cccc.charCodeAt(3)),
+            offset = cp - 0x10000;
+            return (fromCharCode((offset  >>> 10) + 0xD800)
+                    + fromCharCode((offset & 0x3FF) + 0xDC00));
+        case 3:
+            return fromCharCode(
+                ((0x0f & cccc.charCodeAt(0)) << 12)
+                    | ((0x3f & cccc.charCodeAt(1)) << 6)
+                    |  (0x3f & cccc.charCodeAt(2))
+            );
+        default:
+            return  fromCharCode(
+                ((0x1f & cccc.charCodeAt(0)) << 6)
+                    |  (0x3f & cccc.charCodeAt(1))
+            );
+        }
+    };
+    var btou = function(b) {
+        return b.replace(re_btou, cb_btou);
+    };
+    var cb_decode = function(cccc) {
+        var len = cccc.length,
+        padlen = len % 4,
+        n = (len > 0 ? b64tab[cccc.charAt(0)] << 18 : 0)
+            | (len > 1 ? b64tab[cccc.charAt(1)] << 12 : 0)
+            | (len > 2 ? b64tab[cccc.charAt(2)] <<  6 : 0)
+            | (len > 3 ? b64tab[cccc.charAt(3)]       : 0),
+        chars = [
+            fromCharCode( n >>> 16),
+            fromCharCode((n >>>  8) & 0xff),
+            fromCharCode( n         & 0xff)
+        ];
+        chars.length -= [0, 0, 2, 1][padlen];
+        return chars.join('');
+    };
+    var _atob = global.atob ? function(a) {
+        return global.atob(a);
+    } : function(a){
+        return a.replace(/\S{1,4}/g, cb_decode);
+    };
+    var atob = function(a) {
+        return _atob(String(a).replace(/[^A-Za-z0-9\+\/]/g, ''));
+    };
+    var _decode = buffer ?
+        buffer.from && Uint8Array && buffer.from !== Uint8Array.from
+        ? function(a) {
+            return (a.constructor === buffer.constructor
+                    ? a : buffer.from(a, 'base64')).toString();
+        }
+        : function(a) {
+            return (a.constructor === buffer.constructor
+                    ? a : new buffer(a, 'base64')).toString();
+        }
+        : function(a) { return btou(_atob(a)) };
+    var decode = function(a){
+        return _decode(
+            String(a).replace(/[-_]/g, function(m0) { return m0 == '-' ? '+' : '/' })
+                .replace(/[^A-Za-z0-9\+\/]/g, '')
+        );
+    };
+    var noConflict = function() {
+        var Base64 = global.Base64;
+        global.Base64 = _Base64;
+        return Base64;
+    };
+    // export Base64
+    global.Base64 = {
+        VERSION: version,
+        atob: atob,
+        btoa: btoa,
+        fromBase64: decode,
+        toBase64: encode,
+        utob: utob,
+        encode: encode,
+        encodeURI: encodeURI,
+        btou: btou,
+        decode: decode,
+        noConflict: noConflict,
+        __buffer__: buffer
+    };
+    // if ES5 is available, make Base64.extendString() available
+    if (typeof Object.defineProperty === 'function') {
+        var noEnum = function(v){
+            return {value:v,enumerable:false,writable:true,configurable:true};
+        };
+        global.Base64.extendString = function () {
+            Object.defineProperty(
+                String.prototype, 'fromBase64', noEnum(function () {
+                    return decode(this)
+                }));
+            Object.defineProperty(
+                String.prototype, 'toBase64', noEnum(function (urisafe) {
+                    return encode(this, urisafe)
+                }));
+            Object.defineProperty(
+                String.prototype, 'toBase64URI', noEnum(function () {
+                    return encode(this, true)
+                }));
+        };
+    }
+    //
+    // export Base64 to the namespace
+    //
+    if (global['Meteor']) { // Meteor.js
+        Base64 = global.Base64;
+    }
+    // module.exports and AMD are mutually exclusive.
+    // module.exports has precedence.
+    if ( true && module.exports) {
+        module.exports.Base64 = global.Base64;
+    }
+    else if (true) {
+        // AMD. Register as an anonymous module.
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function(){ return global.Base64 }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    }
+    // that's it!
+    return {Base64: global.Base64}
+}));
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
 /***/ "./node_modules/popper.js/dist/esm/popper.js":
 /*!***************************************************!*\
   !*** ./node_modules/popper.js/dist/esm/popper.js ***!
@@ -17041,10 +17288,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var popper_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! popper.js */ "./node_modules/popper.js/dist/esm/popper.js");
 /* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! bootstrap */ "./node_modules/bootstrap/dist/js/bootstrap.js");
 /* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(bootstrap__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _components_form_fieldset__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/form/fieldset */ "./src/components/form/fieldset.js");
-/* harmony import */ var _components_form_fieldset__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_components_form_fieldset__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _components_card_collapsible_card__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/card/collapsible-card */ "./src/components/card/collapsible-card.js");
-/* harmony import */ var _components_card_collapsible_card__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_components_card_collapsible_card__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var js_base64__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! js-base64 */ "./node_modules/js-base64/base64.js");
+/* harmony import */ var js_base64__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(js_base64__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _components_form_fieldset__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/form/fieldset */ "./src/components/form/fieldset.js");
+/* harmony import */ var _components_form_fieldset__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_components_form_fieldset__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _components_card_collapsible_card__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../components/card/collapsible-card */ "./src/components/card/collapsible-card.js");
+/* harmony import */ var _components_card_collapsible_card__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_components_card_collapsible_card__WEBPACK_IMPORTED_MODULE_4__);
+
 
  // Components.
 // TODO: Break this into libraries.
@@ -17052,7 +17302,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-(function ($, Drupal) {
+(function ($, Drupal, drupalSettings) {
   Drupal.behaviors.side_menu = {
     attach: function attach(context, settings) {
       var pathName = location.pathname;
@@ -17114,7 +17364,55 @@ __webpack_require__.r(__webpack_exports__);
       });
     }
   };
-})(jQuery, Drupal);
+  Drupal.behaviors.generate_auth_token = {
+    attach: function attach(context, settings) {
+      var modalMarkup = "<div class=\"modal fade\" id=\"authModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"authModalLabel\" aria-hidden=\"true\">\n        <div class=\"modal-dialog modal-dialog-centered\" role=\"document\">\n          <div class=\"modal-content\">\n            <div class=\"modal-header\">\n              <h5 class=\"modal-title\">Create Authorization Token</h5>\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\n                <span aria-hidden=\"true\">&times;</span>\n              </button>\n            </div>\n            <div class=\"modal-body\">\n              <form>\n                <div class=\"form-group\">\n                  <label for=\"scopes\">Scope</label>\n                  <select class=\"form-control\" id=\"scopes\">\n                    <option value=\"accounts\">Accounts</option>\n                    <option value=\"payments\">Payments</option>\n                  </select>\n                </div>\n                <div class=\"form-group\">\n                  <label><input type=\"checkbox\" name=\"default-token\" id=\"default-token\"> Use default</label>\n                </div>\n                <div class=\"form-group client-info\">\n                  <label for=\"client-id\">Custom Client Id</label>\n                  <input type=\"text\" class=\"form-control\" id=\"client-id\">\n                </div>\n                <div class=\"form-group client-info\">\n                  <label for=\"client-secret\">Custom Client Secret</label>\n                  <input type=\"text\" class=\"form-control\" id=\"client-secret\">\n                </div>\n              </form>\n            </div>\n            <div class=\"modal-footer justify-content-center\">\n              <button type=\"button\" class=\"btn btn-success\" data-dismiss=\"modal\">Create Token</button>\n            </div>\n          </div>\n        </div>\n      </div>";
+      $('body').once().append(modalMarkup);
+      $('.try-out__btn').on('click', function (event) {
+        event.preventDefault();
+        var tryBtn = $(this);
+        var paramRows = tryBtn.closest('.opblock-section').find('tr');
+        paramRows.each(function () {
+          var row = $(this);
+
+          if (row.data('paramName') == 'Authorization') {
+            row.find('.parameters-col_description').once().append('<a href="#" class="btn btn-sm authorize" data-toggle="modal" data-target="#authModal">Generate Token</a>');
+          }
+
+          $('#authModal').find('#default-token').on('change', function () {
+            if ($(this).is(':checked')) {
+              $(this).closest('.form-group').siblings('.client-info').addClass('hidden');
+            } else {
+              $(this).closest('.form-group').siblings('.client-info').removeClass('hidden');
+            }
+          });
+          $('#authModal').find('.btn-success').on('click', function () {
+            var modalForm = $(this).closest('.modal-content').find('form');
+            var defaultAuthToken = drupalSettings.apigee_openbank_psu_oauth.default_auth;
+            var scope = modalForm.find('#scopes').val();
+            var defaultToken = modalForm.find('#default-token').is(':checked');
+            var clientId = modalForm.find('#client-id').val();
+            var clientSecret = modalForm.find('#client-secret').val();
+            var token = "".concat(clientId, ":").concat(clientSecret);
+            var base64Encoded = js_base64__WEBPACK_IMPORTED_MODULE_2__["Base64"].encode(token);
+
+            if (row.data('paramName') == 'scope') {
+              row.find('select').val(scope);
+            }
+
+            if (row.data('paramName') == 'Authorization') {
+              if (defaultToken) {
+                row.find('input[type="text"]').val(defaultAuthToken[scope]);
+              } else {
+                row.find('input[type="text"]').val(base64Encoded);
+              }
+            }
+          });
+        });
+      });
+    }
+  };
+})(jQuery, Drupal, drupalSettings);
 
 /***/ }),
 
@@ -17136,8 +17434,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee-openbank-devportal-kickstart/themes/custom/apigee_openbank_kickstart/src/js/apigee-openbank-kickstart.script.js */"./src/js/apigee-openbank-kickstart.script.js");
-module.exports = __webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee-openbank-devportal-kickstart/themes/custom/apigee_openbank_kickstart/src/sass/apigee-openbank-kickstart.style.scss */"./src/sass/apigee-openbank-kickstart.style.scss");
+__webpack_require__(/*! /Users/haneetsingh/Sites/Srijan/apigee-devportal/web/profiles/contrib/apigee-devportal-openbank-kickstart/themes/custom/apigee_openbank_kickstart/src/js/apigee-openbank-kickstart.script.js */"./src/js/apigee-openbank-kickstart.script.js");
+module.exports = __webpack_require__(/*! /Users/haneetsingh/Sites/Srijan/apigee-devportal/web/profiles/contrib/apigee-devportal-openbank-kickstart/themes/custom/apigee_openbank_kickstart/src/sass/apigee-openbank-kickstart.style.scss */"./src/sass/apigee-openbank-kickstart.style.scss");
 
 
 /***/ })
