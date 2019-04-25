@@ -17364,6 +17364,15 @@ __webpack_require__.r(__webpack_exports__);
       });
     }
   };
+  Drupal.behaviors.base_url = {
+    attach: function attach(context, settings) {
+      if ($('.base-url').length) {
+        var text = $('.base-url').text();
+        text = text.replace(/\[|\]/g, '');
+        $('.swagger-ui:not(.swagger-container)').once().prepend("<h4>".concat(text, "</h4>"));
+      }
+    }
+  };
   Drupal.behaviors.generate_auth_token = {
     attach: function attach(context, settings) {
       var modalMarkup = "<div class=\"modal fade\" id=\"authModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"authModalLabel\" aria-hidden=\"true\">\n        <div class=\"modal-dialog modal-dialog-centered\" role=\"document\">\n          <div class=\"modal-content\">\n            <div class=\"modal-header\">\n              <h5 class=\"modal-title\">Create Authorization Token</h5>\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\n                <span aria-hidden=\"true\">&times;</span>\n              </button>\n            </div>\n            <div class=\"modal-body\">\n              <form>\n                <div class=\"form-group\">\n                  <label for=\"scopes\">Scope</label>\n                  <select class=\"form-control\" id=\"scopes\">\n                    <option value=\"accounts\">Accounts</option>\n                    <option value=\"payments\">Payments</option>\n                  </select>\n                </div>\n                <div class=\"form-group\">\n                  <label><input type=\"checkbox\" name=\"default-token\" id=\"default-token\"> Use default</label>\n                </div>\n                <div class=\"form-group client-info\">\n                  <label for=\"client-id\">Custom Client Id</label>\n                  <input type=\"text\" class=\"form-control\" id=\"client-id\">\n                </div>\n                <div class=\"form-group client-info\">\n                  <label for=\"client-secret\">Custom Client Secret</label>\n                  <input type=\"text\" class=\"form-control\" id=\"client-secret\">\n                </div>\n              </form>\n            </div>\n            <div class=\"modal-footer justify-content-center\">\n              <button type=\"button\" class=\"btn btn-success\" data-dismiss=\"modal\">Create Token</button>\n            </div>\n          </div>\n        </div>\n      </div>";

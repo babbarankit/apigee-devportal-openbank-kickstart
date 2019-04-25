@@ -69,6 +69,16 @@ import '../components/card/collapsible-card';
     }
   };
 
+  Drupal.behaviors.base_url = {
+    attach: function(context, settings) {
+      if ($('.base-url').length) {
+        var text = $('.base-url').text();
+        text = text.replace(/\[|\]/g, '');
+        $('.swagger-ui:not(.swagger-container)').once().prepend(`<h4>${text}</h4>`);
+      }
+    }
+  };
+
   Drupal.behaviors.generate_auth_token = {
     attach: function(context, settings) {
       var modalMarkup = `<div class="modal fade" id="authModal" tabindex="-1" role="dialog" aria-labelledby="authModalLabel" aria-hidden="true">
