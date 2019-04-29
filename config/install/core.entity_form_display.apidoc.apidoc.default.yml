@@ -4,12 +4,18 @@ dependencies:
   config:
     - field.field.apidoc.apidoc.field_categories
     - field.field.apidoc.apidoc.field_image
+    - field.field.apidoc.apidoc.field_location
+    - field.field.apidoc.apidoc.field_meta_tags
+    - field.field.apidoc.apidoc.field_rating
+    - field.field.apidoc.apidoc.field_subscription_type
   module:
     - apigee_edge_apidocs
     - file
     - media_library
+    - metatag
     - path
     - text
+    - votingapi_widgets
 id: apidoc.apidoc.default
 targetEntityType: apidoc
 bundle: apidoc
@@ -47,6 +53,31 @@ content:
     settings: {  }
     third_party_settings: {  }
     region: content
+  field_location:
+    weight: 7
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+    region: content
+  field_meta_tags:
+    type: metatag_firehose
+    weight: 9
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_rating:
+    type: voting_api_widget
+    weight: 10
+    region: content
+    settings:
+      show_initial_vote: 0
+    third_party_settings: {  }
+  field_subscription_type:
+    weight: 6
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+    region: content
   name:
     type: string_textfield
     weight: 0
@@ -57,7 +88,7 @@ content:
     third_party_settings: {  }
   path:
     type: path
-    weight: 6
+    weight: 8
     region: content
     settings: {  }
     third_party_settings: {  }
