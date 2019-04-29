@@ -1,0 +1,7 @@
+apigee-psu:
+  version: 1.x
+  js:
+    js/apigee-psu.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings

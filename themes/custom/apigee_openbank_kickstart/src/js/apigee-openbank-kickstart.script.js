@@ -6,7 +6,7 @@ import 'bootstrap';
 import '../components/form/fieldset';
 import '../components/card/collapsible-card';
 
-(function($, Drupal) {
+(function($, Drupal, drupalSettings) {
   Drupal.behaviors.side_menu = {
     attach: function(context, settings) {
       var pathName = location.pathname;
@@ -44,6 +44,7 @@ import '../components/card/collapsible-card';
       }
     }
   };
+
   Drupal.behaviors.internal_block_scroll = {
     attach: function(context, settings) {
       $('.api-explorer__method.internal').click(function(event) {
@@ -67,4 +68,13 @@ import '../components/card/collapsible-card';
     }
   };
 
-})(jQuery, Drupal);
+  Drupal.behaviors.base_url = {
+    attach: function(context, settings) {
+      if ($('.base-url').length) {
+        var text = $('.base-url').text();
+        text = text.replace(/\[|\]/g, '');
+        $('.swagger-ui:not(.swagger-container)').once().prepend(`<h4 class="base-path">${text}</h4>`);
+      }
+    }
+  };
+})(jQuery, Drupal, drupalSettings);
