@@ -2,11 +2,17 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.user.user.field_notify_user
     - field.field.user.user.user_picture
     - image.style.thumbnail
   module:
+<<<<<<< HEAD
     - image
     - path
+=======
+    - path
+    - svg_image
+>>>>>>> 8.x-1.x
     - user
 id: user.user.default
 targetEntityType: user
@@ -14,11 +20,14 @@ bundle: user
 mode: default
 content:
   account:
-    weight: -10
+    weight: 2
     region: content
+    settings: {  }
+    third_party_settings: {  }
   contact:
     weight: 5
     region: content
+<<<<<<< HEAD
   first_name:
     type: string_textfield
     weight: '-11'
@@ -28,11 +37,39 @@ content:
     region: content
     third_party_settings: {  }
   language:
-    weight: 0
+=======
+    settings: {  }
+    third_party_settings: {  }
+  field_notify_user:
+    type: boolean_checkbox
+    weight: 7
     region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  first_name:
+    type: string_textfield
+>>>>>>> 8.x-1.x
+    weight: 0
+    settings:
+      size: 60
+      placeholder: ''
+    region: content
+<<<<<<< HEAD
   last_name:
     type: string_textfield
     weight: '-11'
+=======
+    third_party_settings: {  }
+  language:
+    weight: 4
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  last_name:
+    type: string_textfield
+    weight: 1
+>>>>>>> 8.x-1.x
     settings:
       size: 60
       placeholder: ''
@@ -40,19 +77,25 @@ content:
     third_party_settings: {  }
   path:
     type: path
+<<<<<<< HEAD
     weight: 30
+=======
+    weight: 8
+>>>>>>> 8.x-1.x
     region: content
     settings: {  }
     third_party_settings: {  }
   timezone:
     weight: 6
     region: content
+    settings: {  }
+    third_party_settings: {  }
   user_picture:
     type: image_image
     settings:
       progress_indicator: throbber
       preview_image_style: thumbnail
     third_party_settings: {  }
-    weight: -1
+    weight: 3
     region: content
 hidden: {  }

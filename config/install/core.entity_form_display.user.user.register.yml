@@ -3,10 +3,11 @@ status: true
 dependencies:
   config:
     - core.entity_form_mode.user.register
+    - field.field.user.user.field_notify_user
     - field.field.user.user.user_picture
     - image.style.thumbnail
   module:
-    - image
+    - svg_image
     - user
 id: user.user.register
 targetEntityType: user
@@ -17,6 +18,13 @@ content:
     weight: 2
     region: content
     settings: {  }
+    third_party_settings: {  }
+  field_notify_user:
+    type: boolean_checkbox
+    weight: 5
+    region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   first_name:
     type: string_textfield
@@ -50,4 +58,8 @@ content:
 hidden:
   contact: true
   language: true
+<<<<<<< HEAD
   path: true
+=======
+  path: true
+>>>>>>> 8.x-1.x

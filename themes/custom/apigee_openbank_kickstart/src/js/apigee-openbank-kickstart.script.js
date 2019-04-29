@@ -44,7 +44,6 @@ import '../components/card/collapsible-card';
       }
     }
   };
-
   Drupal.behaviors.internal_block_scroll = {
     attach: function(context, settings) {
       $('.api-explorer__method.internal').click(function(event) {
