@@ -6,8 +6,13 @@ dependencies:
     - field.field.user.user.user_picture
     - image.style.thumbnail
   module:
+<<<<<<< HEAD
+    - image
+    - path
+=======
     - path
     - svg_image
+>>>>>>> 8.x-1.x
     - user
 id: user.user.default
 targetEntityType: user
@@ -22,6 +27,17 @@ content:
   contact:
     weight: 5
     region: content
+<<<<<<< HEAD
+  first_name:
+    type: string_textfield
+    weight: '-11'
+    settings:
+      size: 60
+      placeholder: ''
+    region: content
+    third_party_settings: {  }
+  language:
+=======
     settings: {  }
     third_party_settings: {  }
   field_notify_user:
@@ -33,11 +49,17 @@ content:
     third_party_settings: {  }
   first_name:
     type: string_textfield
+>>>>>>> 8.x-1.x
     weight: 0
     settings:
       size: 60
       placeholder: ''
     region: content
+<<<<<<< HEAD
+  last_name:
+    type: string_textfield
+    weight: '-11'
+=======
     third_party_settings: {  }
   language:
     weight: 4
@@ -47,6 +69,7 @@ content:
   last_name:
     type: string_textfield
     weight: 1
+>>>>>>> 8.x-1.x
     settings:
       size: 60
       placeholder: ''
@@ -54,7 +77,11 @@ content:
     third_party_settings: {  }
   path:
     type: path
+<<<<<<< HEAD
+    weight: 30
+=======
     weight: 8
+>>>>>>> 8.x-1.x
     region: content
     settings: {  }
     third_party_settings: {  }

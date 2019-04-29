@@ -14399,6 +14399,253 @@ return jQuery;
 
 /***/ }),
 
+/***/ "./node_modules/js-base64/base64.js":
+/*!******************************************!*\
+  !*** ./node_modules/js-base64/base64.js ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
+ *  base64.js
+ *
+ *  Licensed under the BSD 3-Clause License.
+ *    http://opensource.org/licenses/BSD-3-Clause
+ *
+ *  References:
+ *    http://en.wikipedia.org/wiki/Base64
+ */
+;(function (global, factory) {
+     true
+        ? module.exports = factory(global)
+        : undefined
+}((
+    typeof self !== 'undefined' ? self
+        : typeof window !== 'undefined' ? window
+        : typeof global !== 'undefined' ? global
+: this
+), function(global) {
+    'use strict';
+    // existing version for noConflict()
+    global = global || {};
+    var _Base64 = global.Base64;
+    var version = "2.5.1";
+    // if node.js and NOT React Native, we use Buffer
+    var buffer;
+    if ( true && module.exports) {
+        try {
+            buffer = eval("require('buffer').Buffer");
+        } catch (err) {
+            buffer = undefined;
+        }
+    }
+    // constants
+    var b64chars
+        = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+    var b64tab = function(bin) {
+        var t = {};
+        for (var i = 0, l = bin.length; i < l; i++) t[bin.charAt(i)] = i;
+        return t;
+    }(b64chars);
+    var fromCharCode = String.fromCharCode;
+    // encoder stuff
+    var cb_utob = function(c) {
+        if (c.length < 2) {
+            var cc = c.charCodeAt(0);
+            return cc < 0x80 ? c
+                : cc < 0x800 ? (fromCharCode(0xc0 | (cc >>> 6))
+                                + fromCharCode(0x80 | (cc & 0x3f)))
+                : (fromCharCode(0xe0 | ((cc >>> 12) & 0x0f))
+                   + fromCharCode(0x80 | ((cc >>>  6) & 0x3f))
+                   + fromCharCode(0x80 | ( cc         & 0x3f)));
+        } else {
+            var cc = 0x10000
+                + (c.charCodeAt(0) - 0xD800) * 0x400
+                + (c.charCodeAt(1) - 0xDC00);
+            return (fromCharCode(0xf0 | ((cc >>> 18) & 0x07))
+                    + fromCharCode(0x80 | ((cc >>> 12) & 0x3f))
+                    + fromCharCode(0x80 | ((cc >>>  6) & 0x3f))
+                    + fromCharCode(0x80 | ( cc         & 0x3f)));
+        }
+    };
+    var re_utob = /[\uD800-\uDBFF][\uDC00-\uDFFFF]|[^\x00-\x7F]/g;
+    var utob = function(u) {
+        return u.replace(re_utob, cb_utob);
+    };
+    var cb_encode = function(ccc) {
+        var padlen = [0, 2, 1][ccc.length % 3],
+        ord = ccc.charCodeAt(0) << 16
+            | ((ccc.length > 1 ? ccc.charCodeAt(1) : 0) << 8)
+            | ((ccc.length > 2 ? ccc.charCodeAt(2) : 0)),
+        chars = [
+            b64chars.charAt( ord >>> 18),
+            b64chars.charAt((ord >>> 12) & 63),
+            padlen >= 2 ? '=' : b64chars.charAt((ord >>> 6) & 63),
+            padlen >= 1 ? '=' : b64chars.charAt(ord & 63)
+        ];
+        return chars.join('');
+    };
+    var btoa = global.btoa ? function(b) {
+        return global.btoa(b);
+    } : function(b) {
+        return b.replace(/[\s\S]{1,3}/g, cb_encode);
+    };
+    var _encode = buffer ?
+        buffer.from && Uint8Array && buffer.from !== Uint8Array.from
+        ? function (u) {
+            return (u.constructor === buffer.constructor ? u : buffer.from(u))
+                .toString('base64')
+        }
+        :  function (u) {
+            return (u.constructor === buffer.constructor ? u : new  buffer(u))
+                .toString('base64')
+        }
+        : function (u) { return btoa(utob(u)) }
+    ;
+    var encode = function(u, urisafe) {
+        return !urisafe
+            ? _encode(String(u))
+            : _encode(String(u)).replace(/[+\/]/g, function(m0) {
+                return m0 == '+' ? '-' : '_';
+            }).replace(/=/g, '');
+    };
+    var encodeURI = function(u) { return encode(u, true) };
+    // decoder stuff
+    var re_btou = new RegExp([
+        '[\xC0-\xDF][\x80-\xBF]',
+        '[\xE0-\xEF][\x80-\xBF]{2}',
+        '[\xF0-\xF7][\x80-\xBF]{3}'
+    ].join('|'), 'g');
+    var cb_btou = function(cccc) {
+        switch(cccc.length) {
+        case 4:
+            var cp = ((0x07 & cccc.charCodeAt(0)) << 18)
+                |    ((0x3f & cccc.charCodeAt(1)) << 12)
+                |    ((0x3f & cccc.charCodeAt(2)) <<  6)
+                |     (0x3f & cccc.charCodeAt(3)),
+            offset = cp - 0x10000;
+            return (fromCharCode((offset  >>> 10) + 0xD800)
+                    + fromCharCode((offset & 0x3FF) + 0xDC00));
+        case 3:
+            return fromCharCode(
+                ((0x0f & cccc.charCodeAt(0)) << 12)
+                    | ((0x3f & cccc.charCodeAt(1)) << 6)
+                    |  (0x3f & cccc.charCodeAt(2))
+            );
+        default:
+            return  fromCharCode(
+                ((0x1f & cccc.charCodeAt(0)) << 6)
+                    |  (0x3f & cccc.charCodeAt(1))
+            );
+        }
+    };
+    var btou = function(b) {
+        return b.replace(re_btou, cb_btou);
+    };
+    var cb_decode = function(cccc) {
+        var len = cccc.length,
+        padlen = len % 4,
+        n = (len > 0 ? b64tab[cccc.charAt(0)] << 18 : 0)
+            | (len > 1 ? b64tab[cccc.charAt(1)] << 12 : 0)
+            | (len > 2 ? b64tab[cccc.charAt(2)] <<  6 : 0)
+            | (len > 3 ? b64tab[cccc.charAt(3)]       : 0),
+        chars = [
+            fromCharCode( n >>> 16),
+            fromCharCode((n >>>  8) & 0xff),
+            fromCharCode( n         & 0xff)
+        ];
+        chars.length -= [0, 0, 2, 1][padlen];
+        return chars.join('');
+    };
+    var _atob = global.atob ? function(a) {
+        return global.atob(a);
+    } : function(a){
+        return a.replace(/\S{1,4}/g, cb_decode);
+    };
+    var atob = function(a) {
+        return _atob(String(a).replace(/[^A-Za-z0-9\+\/]/g, ''));
+    };
+    var _decode = buffer ?
+        buffer.from && Uint8Array && buffer.from !== Uint8Array.from
+        ? function(a) {
+            return (a.constructor === buffer.constructor
+                    ? a : buffer.from(a, 'base64')).toString();
+        }
+        : function(a) {
+            return (a.constructor === buffer.constructor
+                    ? a : new buffer(a, 'base64')).toString();
+        }
+        : function(a) { return btou(_atob(a)) };
+    var decode = function(a){
+        return _decode(
+            String(a).replace(/[-_]/g, function(m0) { return m0 == '-' ? '+' : '/' })
+                .replace(/[^A-Za-z0-9\+\/]/g, '')
+        );
+    };
+    var noConflict = function() {
+        var Base64 = global.Base64;
+        global.Base64 = _Base64;
+        return Base64;
+    };
+    // export Base64
+    global.Base64 = {
+        VERSION: version,
+        atob: atob,
+        btoa: btoa,
+        fromBase64: decode,
+        toBase64: encode,
+        utob: utob,
+        encode: encode,
+        encodeURI: encodeURI,
+        btou: btou,
+        decode: decode,
+        noConflict: noConflict,
+        __buffer__: buffer
+    };
+    // if ES5 is available, make Base64.extendString() available
+    if (typeof Object.defineProperty === 'function') {
+        var noEnum = function(v){
+            return {value:v,enumerable:false,writable:true,configurable:true};
+        };
+        global.Base64.extendString = function () {
+            Object.defineProperty(
+                String.prototype, 'fromBase64', noEnum(function () {
+                    return decode(this)
+                }));
+            Object.defineProperty(
+                String.prototype, 'toBase64', noEnum(function (urisafe) {
+                    return encode(this, urisafe)
+                }));
+            Object.defineProperty(
+                String.prototype, 'toBase64URI', noEnum(function () {
+                    return encode(this, true)
+                }));
+        };
+    }
+    //
+    // export Base64 to the namespace
+    //
+    if (global['Meteor']) { // Meteor.js
+        Base64 = global.Base64;
+    }
+    // module.exports and AMD are mutually exclusive.
+    // module.exports has precedence.
+    if ( true && module.exports) {
+        module.exports.Base64 = global.Base64;
+    }
+    else if (true) {
+        // AMD. Register as an anonymous module.
+        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function(){ return global.Base64 }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    }
+    // that's it!
+    return {Base64: global.Base64}
+}));
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
 /***/ "./node_modules/popper.js/dist/esm/popper.js":
 /*!***************************************************!*\
   !*** ./node_modules/popper.js/dist/esm/popper.js ***!
@@ -17052,7 +17299,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-(function ($, Drupal) {
+(function ($, Drupal, drupalSettings) {
   Drupal.behaviors.side_menu = {
     attach: function attach(context, settings) {
       var pathName = location.pathname;
@@ -17114,7 +17361,276 @@ __webpack_require__.r(__webpack_exports__);
       });
     }
   };
-})(jQuery, Drupal);
+  Drupal.behaviors.base_url = {
+    attach: function attach(context, settings) {
+      if ($('.base-url').length) {
+        var text = $('.base-url').text();
+        text = text.replace(/\[|\]/g, '');
+        $('.swagger-ui:not(.swagger-container)').once().prepend("<h4 class=\"base-path\">".concat(text, "</h4>"));
+      }
+    }
+  };
+})(jQuery, Drupal, drupalSettings);
+
+/***/ }),
+
+/***/ "./src/js/apigee-openbank-psuoauth.script.js":
+/*!***************************************************!*\
+  !*** ./src/js/apigee-openbank-psuoauth.script.js ***!
+  \***************************************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var js_base64__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! js-base64 */ "./node_modules/js-base64/base64.js");
+/* harmony import */ var js_base64__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(js_base64__WEBPACK_IMPORTED_MODULE_0__);
+
+
+(function ($, Drupal, drupalSettings) {
+  Drupal.behaviors.generate_auth_token = {
+    attach: function attach(context, settings) {
+      var base_url = 'https://ankitbabbar-eval-test.apigee.net';
+      var org = 'ankitbabbar-eval';
+      var accounts_smartdoc_name = 'accounts-apis-v1-0';
+      var accounts_oauth_name = 'PSUOAuth2Security';
+      var payments_smartdoc_name = 'payments-apis-v1-0';
+      var payments_oauth_name = 'PSUOAuth2Security';
+      var client_id_accounts = drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.client_id;
+      var client_secret_accounts = drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.client_secret;
+      var client_id_payments = drupalSettings.apigee_openbank_psu_oauth.default_auth.payments.client_id;
+      var client_secret_payments = drupalSettings.apigee_openbank_psu_oauth.default_auth.payments.client_secret;
+      var template_callback_accounts = "https://api.enterprise.apigee.com/v1/o/".concat(org, "/apimodels/").concat(accounts_smartdoc_name, "/templateauths/").concat(accounts_oauth_name, "/callback");
+      var template_callback_payments = "https://api.enterprise.apigee.com/v1/o/".concat(org, "/apimodels/").concat(payments_smartdoc_name, "/templateauths/").concat(payments_oauth_name, "/callback");
+      var jose_header = "{\n\t\t\t\t\"alg\": \"RS256\",\n\t\t\t\t\"kid\": \"".concat(drupalSettings.apigee_openbank_psu_oauth.private_key_certificate_id, "\",\n\t\t\t\t\"b64\": \"false\",\n\t\t\t\t\"http://openbanking.org.uk/iat\": \"2017-06-12T20:05:50 00:00\",\n\t\t\t\t\"http://openbanking.org.uk/iss\": \"C=UK, ST=England, L=London, O=Acme Ltd.\",\n\t\t\t\t\"crit\": [\"b64\", \"http://openbanking.org.uk/iat\", \"http://openbanking.org.uk/iss\"]\n\t\t\t}");
+      var modalMarkup = "<div class=\"modal fade\" id=\"authModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"authModalLabel\" aria-hidden=\"true\">\n\t\t\t\t<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">\n\t\t\t\t\t<div class=\"modal-content\">\n\t\t\t\t\t\t<div class=\"modal-header\">\n\t\t\t\t\t\t\t<h3 class=\"modal-title\">Create Authorization Token</h3>\n\t\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\n\t\t\t\t\t\t\t\t<span aria-hidden=\"true\">&times;</span>\n\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"modal-body\">\n\t\t\t\t\t\t\t<form class=\"create-token\">\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<label for=\"scopes\">Scope</label>\n\t\t\t\t\t\t\t\t\t<select class=\"form-control\" id=\"scopes\">\n\t\t\t\t\t\t\t\t\t\t<option value=\"accounts\">Accounts</option>\n\t\t\t\t\t\t\t\t\t\t<option value=\"payments\">Payments</option>\n\t\t\t\t\t\t\t\t\t</select>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<label><input type=\"checkbox\" name=\"default-token\" id=\"default-token\"> Use default</label>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group client-info\">\n\t\t\t\t\t\t\t\t\t<label for=\"client-id\">Custom Client Id</label>\n\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" id=\"client-id\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group client-info\">\n\t\t\t\t\t\t\t\t\t<label for=\"client-secret\">Custom Client Secret</label>\n\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" id=\"client-secret\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row justify-content-end mr-4\">\n\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-send rounded-sm mr-2\" data-dismiss=\"modal\" style=\"font-size:.750rem;\">Create Token</button>\n\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-cancel\" data-dismiss=\"modal\" style=\"font-size:.750rem;\">Cancel</button>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</form>\n\n\t\t\t\t\t\t\t<form class=\"set-token hidden\">\n\t\t\t\t\t\t\t\t<div class=\"form-group row\">\n\t\t\t\t\t\t\t\t\t<label for=\"authorization\" class=\"col-sm-4\">Authorization</label>\n\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control col-sm-7\" id=\"authorization\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row\">\n\t\t\t\t\t\t\t\t\t<label for=\"grant-type\" class=\"col-sm-4\">Grant Type</label>\n\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control col-sm-7\" id=\"grant-type\" value=\"client_credentials\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row\">\n\t\t\t\t\t\t\t\t\t<label for=\"scopes\" class=\"col-sm-4\">Scope</label>\n\t\t\t\t\t\t\t\t\t<select class=\"form-control col-sm-7\" id=\"scope-type\">\n\t\t\t\t\t\t\t\t\t\t<option value=\"accounts\">Accounts</option>\n\t\t\t\t\t\t\t\t\t\t<option value=\"payments\">Payments</option>\n\t\t\t\t\t\t\t\t\t</select>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row justify-content-end mr-4\">\n\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-send rounded-sm mr-2\" style=\"font-size:.750rem;\">Send</button>\n\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-cancel rounded-sm\" data-dismiss=\"modal\" style=\"font-size:.750rem;\">Cancel</button>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</form>\n\n\t\t\t\t\t\t\t<form class=\"create-request hidden\">\n\t\t\t\t\t\t\t\t<div class=\"form-group row\">\n\t\t\t\t\t\t\t\t\t<label for=\"bearer-token\" class=\"col-sm-4\">Authorization</label>\n\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control col-sm-7\" id=\"bearer-token\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row\">\n\t\t\t\t\t\t\t\t\t<label for=\"financial-id\" class=\"col-sm-4\">x-fapi-financial-id</label>\n\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control col-sm-7\" id=\"financial-id\" value=\"123456789\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row d-none\">\n\t\t\t\t\t\t\t\t\t<label for=\"idempotency-key\" class=\"col-sm-4\">x-idempotency-key</label>\n\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control col-sm-7\" id=\"idempotency-key\" value=\"123456789\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row\">\n\t\t\t\t\t\t\t\t\t<label for=\"req-payload\" class=\"col-sm-4\">body</label>\n\t\t\t\t\t\t\t\t\t<textarea id=\"req-payload\" class=\"col-sm-7\" cols=\"30\" rows=\"13\"></textarea>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row justify-content-end mr-4\">\n\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-send rounded-sm mr-2\" style=\"font-size:.750rem;\">Send</button>\n\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-cancel rounded-sm\" data-dismiss=\"modal\" style=\"font-size:.750rem;\">Cancel</button>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</form>\n\n\t\t\t\t\t\t\t<form class=\"authorise-request hidden\">\n\t\t\t\t\t\t\t\t<div class=\"form-group row\">\n\t\t\t\t\t\t\t\t\t<label for=\"request-token\" class=\"col-sm-4\">request</label>\n\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control col-sm-7\" id=\"request-token\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row justify-content-end mr-4\">\n\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-send rounded-sm mr-2\" data-dismiss=\"modal\" style=\"font-size:.750rem;\">Send</button>\n\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-cancel rounded-sm\" data-dismiss=\"modal\" style=\"font-size:.750rem;\" >Cancel</button>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</form>\n\n\t\t\t\t\t\t\t<div class=\"d-flex justify-content-center\">\n\t\t\t\t\t\t\t\t<div class=\"spinner-border d-none\" style=\"width: 3rem; height: 3rem;\" role=\"status\">\n\t\t\t\t\t\t\t\t\t<span class=\"sr-only\">Loading...</span>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>";
+      $('body', context).once().append(modalMarkup);
+      $('body', context).on('click', '.try-out__btn', function (event) {
+        event.preventDefault();
+        var tryBtn = $(this);
+        var paramRows = tryBtn.closest('.opblock-section').find('tr');
+        paramRows.each(function () {
+          var row = $(this);
+
+          if (row.data('paramName') == 'Authorization') {
+            row.find('.parameters-col_description').once().append('<a href="#" class="btn btn-sm authorize" data-toggle="modal" data-target="#authModal">Generate Token</a>');
+          }
+
+          var file = $('.information-container .link').attr('href');
+          var methodType = $(this).parents('.opblock').find('.opblock-summary-method').text().toLowerCase();
+          var methodPath = $(this).parents('.opblock').find('.opblock-summary-path').data('path');
+          $.getJSON(file, function (data) {
+            var method = data.paths[methodPath];
+
+            if (method[methodType].security.length) {
+              var authToken = localStorage.getItem('token') ? localStorage.getItem('token') : drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.token;
+              $('#authModal').find('.create-token').addClass('hidden');
+              $('#authModal').find('.set-token').removeClass('hidden');
+              $('#authModal').find('.modal-title').text('Step 1: Get Client Credential Access Token');
+              $('.set-token').find('#authorization').val(authToken);
+            }
+
+            $('.btn-cancel').on('click', function () {
+              ResetAndCancel();
+            });
+            $('.create-token .btn-send').on('click', function () {
+              var modalForm = $(this).closest('.modal-content').find('form');
+              var defaultAuthToken = drupalSettings.apigee_openbank_psu_oauth.default_auth;
+              var scope = modalForm.find('#scopes').val();
+              var defaultToken = modalForm.find('#default-token').is(':checked');
+              var clientId = modalForm.find('#client-id').val();
+              var clientSecret = modalForm.find('#client-secret').val();
+              var token = "".concat(clientId, ":").concat(clientSecret);
+              var base64Encoded = js_base64__WEBPACK_IMPORTED_MODULE_0__["Base64"].encode(token);
+
+              if (row.data('paramName') == 'scope') {
+                row.find('select').val(scope);
+              }
+
+              if (row.data('paramName') == 'Authorization') {
+                if (defaultToken) {
+                  row.find('input[type="text"]').val(defaultAuthToken[scope].token);
+                  localStorage.setItem('token', defaultAuthToken[scope].token);
+                } else {
+                  row.find('input[type="text"]').val(base64Encoded);
+                  localStorage.setItem('token', base64Encoded);
+                }
+              }
+            });
+            $('#authModal').find('#default-token').on('change', function () {
+              if ($(this).is(':checked')) {
+                $(this).closest('.form-group').siblings('.client-info').addClass('hidden');
+              } else {
+                $(this).closest('.form-group').siblings('.client-info').removeClass('hidden');
+              }
+            });
+            $('.set-token').find('#scope-type').on('change', function () {
+              $('.set-token').find('#authorization').val(drupalSettings.apigee_openbank_psu_oauth.default_auth[$(this).val()].token);
+            });
+            $('.set-token .btn-send').on('click', createToken);
+          });
+        });
+      });
+
+      function createToken() {
+        $('.spinner-border').removeClass('d-none');
+        localStorage.setItem('scope', $('.set-token select').val());
+        var oauthURL = "".concat(base_url, "//apis/v1.0.1/oauth/token");
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", oauthURL, true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.setRequestHeader("Authorization", $('.set-token #authorization').val());
+        var params = "grant_type=client_credentials&scope=".concat(localStorage.getItem('scope'));
+
+        xhttp.onreadystatechange = function () {
+          if (this.readyState == 4 && this.status == 200) {
+            $('.spinner-border').addClass('d-none');
+            var responseText = JSON.parse(this.responseText);
+            localStorage.setItem('Authorization', "".concat(responseText.token_type, " ").concat(responseText.access_token));
+            createRequestPage();
+          } else if (this.readyState == 4) {
+            ResetAndCancel();
+          }
+        };
+
+        xhttp.send(params);
+      }
+
+      function createRequestPage() {
+        $('#authModal').find('.set-token').addClass('hidden');
+        $('#authModal').find('.create-request').removeClass('hidden');
+        var payload = '';
+
+        if (localStorage.getItem('scope') == 'accounts') {
+          $('#idempotency-key').closest('.row').addClass('d-none');
+          $('#authModal').find('.modal-title').text('Step 2: Create Account Request');
+          payload = '{"Data":{"Permissions":["ReadAccountsDetail","ReadBalances","ReadBeneficiariesDetail","ReadDirectDebits","ReadProducts","ReadStandingOrdersDetail","ReadTransactionsCredits","ReadTransactionsDebits","ReadTransactionsDetail"],"ExpirationDateTime":"2025-08-02T00:00:00-00:00","TransactionFromDateTime":"2012-05-03T00:00:00-00:00","TransactionToDateTime":"2025-05-08T00:00:00-00:00"},"Risk":{}}';
+        } else {
+          $('#idempotency-key').closest('.row').removeClass('d-none');
+          $('#authModal').find('.modal-title').text('Step 2: Create Payment Request');
+          payload = '{"Data":{"Initiation":{"InstructionIdentification":"ACME412","EndToEndIdentification":"FRESCO.21302.GFX.20","InstructedAmount":{"Amount":"165.88","Currency":"GBP"},"CreditorAccount":{"SchemeName":"SortCodeAccountNumber","Identification":"08080021325698","Name":"ACME Inc","SecondaryIdentification":"0002"},"RemittanceInformation":{"Reference":"FRESCO-101","Unstructured":"Internal ops code 5120101"}}},"Risk":{"PaymentContextCode":"EcommerceGoods","MerchantCategoryCode":"5967","MerchantCustomerIdentification":"053598653254","DeliveryAddress":{"AddressLine":["Flat 7","Acacia Lodge"],"StreetName":"Acacia Avenue","BuildingNumber":"27","PostCode":"GU31 2ZZ","TownName":"Sparsholt","CountySubDivision":["Wessex"],"Country":"UK"}}}';
+        }
+
+        $('#bearer-token').val(localStorage.getItem('Authorization'));
+        $('#req-payload').val(payload);
+        $('#idempotency-key').val(Date.parse(new Date()));
+        $('.create-request .btn-send').on('click', createRequestAction);
+      }
+
+      function createRequestAction() {
+        $('.spinner-border').removeClass('d-none');
+        var jws = getJWS(jose_header, $('#req-payload').val());
+        var postRequestURL = '';
+
+        if (localStorage.getItem('scope') == 'accounts') {
+          postRequestURL = "".concat(base_url, "/ais/open-banking/v1.0.1/account-requests");
+        } else {
+          postRequestURL = "".concat(base_url, "/pis/open-banking/v1.0/payments");
+        }
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", postRequestURL, true);
+        xhttp.setRequestHeader("Content-Type", "application/json");
+        xhttp.setRequestHeader("Authorization", localStorage.getItem('Authorization'));
+        xhttp.setRequestHeader("x-fapi-financial-id", $('#financial-id').val());
+        xhttp.setRequestHeader("x-jws-signature", jws);
+        xhttp.setRequestHeader("x-fapi-customer-ip-address", "123456");
+        xhttp.setRequestHeader("Accept", "application/json");
+
+        if (localStorage.getItem('scope') == 'payments') {
+          xhttp.setRequestHeader("x-idempotency-key", $('#idempotency-key').val());
+        }
+
+        var body = $('#req-payload').val();
+
+        xhttp.onreadystatechange = function () {
+          if (this.readyState == 4 && this.status == 201) {
+            $('.spinner-border').addClass('d-none');
+            var responseText = JSON.parse(this.responseText);
+
+            if (localStorage.getItem('scope') == 'accounts') {
+              localStorage.setItem('RequestId', responseText.Data.AccountRequestId);
+            } else {
+              localStorage.setItem('RequestId', responseText.Data.PaymentId);
+            }
+
+            accessTokenPage();
+          } else if (this.readyState == 4) {
+            console.log('Error creating request');
+          }
+        };
+
+        xhttp.send(body);
+      }
+
+      function accessTokenPage() {
+        console.log('accessTokenPage');
+        $('#authModal').find('.create-request').addClass('hidden');
+        $('#authModal').find('.authorise-request').removeClass('hidden');
+        $('#authModal').find('.modal-title').text('Step 3: Set additional Parameters for getting Access Token');
+        localStorage.setItem('nonce', Date.parse(new Date()));
+        var jwtResponse = '';
+
+        if (localStorage.getItem('scope') == 'accounts') {
+          jwtResponse = createJWT('accounts', localStorage.getItem('nonce'), client_id_accounts, template_callback_accounts);
+        } else {
+          jwtResponse = createJWT('payments', localStorage.getItem('nonce'), client_id_payments, template_callback_payments);
+        }
+
+        $('#request-token').val(jwtResponse.jwt);
+        $('.authorise-request .btn-send').on('click', openAuthWindow);
+      }
+
+      function openAuthWindow() {
+        ResetAndCancel();
+        var jwt = $('#request-token').val();
+        var authUrl = '';
+
+        if (localStorage.ccScope == "accounts") {
+          authUrl = "".concat(base_url, "/apis/v1.0/oauth/authorize?response_type=code&client_id=").concat(client_id_accounts, "&state=abcd1234&scope=openid accounts&redirect_uri=").concat(template_callback_accounts);
+        } else {
+          authUrl = "".concat(base_url, "/apis/v1.0/oauth/authorize?response_type=code&client_id=").concat(client_id_payments, "&state=abcd1234&scope=openid accounts&redirect_uri=").concat(template_callback_payments);
+        }
+
+        authUrl += "&request=".concat(jwt, "&nonce=").concat(localStorage.getItem('nonce'));
+        console.log('authUrl', authUrl);
+        var oauth2Window = window.open(authUrl, "oauth2Window", "resizable=yes,scrollbars=yes,status=1,toolbar=1,height=500,width=500");
+      }
+
+      function getJWS(header, payload) {
+        var response = getJsonWebToken(header, payload);
+        var detachedJWT = response.jwt.split(".");
+        var detachedJws = "".concat(detachedJWT[0], "..").concat(detachedJWT[2]);
+        return detachedJws;
+      }
+
+      function createJWT(scope, nonce, clientId, callbackURL) {
+        var jwtBody = "{\n\t\t\t\t\t\"iss\": \"https://api.openbank.com\",\n\t\t\t\t\t\"response_type\": \"code\",\n\t\t\t\t\t\"client_id\": \"".concat(clientId, "\",\n\t\t\t\t\t\"redirect_uri\": \"").concat(callbackURL, "\",\n\t\t\t\t\t\"scope\": \"openid ").concat(scope, "\",\n\t\t\t\t\t\"state\": \"abcd1234\",\n\t\t\t\t\t\"nonce\": \"").concat(nonce, "\",\n\t\t\t\t\t\"claims\": {\n\t\t\t\t\t\t\"id_token\": {\n\t\t\t\t\t\t\t\"openbanking_intent_id\": {\n\t\t\t\t\t\t\t\t\"value\": \"urn:openbank:intent:").concat(scope, ":").concat(localStorage.getItem('RequestId'), "\",\n\t\t\t\t\t\t\t\t\"essential\": true\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\"acr\": {\n\t\t\t\t\t\t\t\t\"essential\": true\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t\"iat\": 1504521455,\n\t\t\t\t\t\"exp\": 1604525055\n\t\t\t\t}");
+        return getJsonWebToken(jose_header, jwtBody);
+      }
+
+      function getJsonWebToken(header, payload) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "".concat(location.origin, "/apigee-openbank-psu-oauth/get-jwt?header=").concat(header, "&payload=").concat(payload), false);
+        var responseText = '';
+        xhttp.send(null);
+
+        if (xhttp.status == 200) {
+          responseText = xhttp.responseText;
+        }
+
+        return JSON.parse(responseText);
+      }
+
+      function ResetAndCancel() {
+        $('#authModal .set-token').removeClass('hidden');
+        $('#authModal form:not(.set-token)').addClass('hidden');
+        $('#authModal .spinner-border').addClass('hidden');
+        $('#authModal').find('.modal-title').text('Create Authorization Token');
+      }
+    }
+  };
+})(jQuery, Drupal, drupalSettings);
 
 /***/ }),
 
@@ -17130,14 +17646,15 @@ __webpack_require__.r(__webpack_exports__);
 /***/ }),
 
 /***/ 0:
-/*!**********************************************************************************************************!*\
-  !*** multi ./src/js/apigee-openbank-kickstart.script.js ./src/sass/apigee-openbank-kickstart.style.scss ***!
-  \**********************************************************************************************************/
+/*!******************************************************************************************************************************************************!*\
+  !*** multi ./src/js/apigee-openbank-kickstart.script.js ./src/js/apigee-openbank-psuoauth.script.js ./src/sass/apigee-openbank-kickstart.style.scss ***!
+  \******************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee-openbank-devportal-kickstart/themes/custom/apigee_openbank_kickstart/src/js/apigee-openbank-kickstart.script.js */"./src/js/apigee-openbank-kickstart.script.js");
-module.exports = __webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee-openbank-devportal-kickstart/themes/custom/apigee_openbank_kickstart/src/sass/apigee-openbank-kickstart.style.scss */"./src/sass/apigee-openbank-kickstart.style.scss");
+__webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee_devportal_openbank_kickstart/themes/custom/apigee_openbank_kickstart/src/js/apigee-openbank-kickstart.script.js */"./src/js/apigee-openbank-kickstart.script.js");
+__webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee_devportal_openbank_kickstart/themes/custom/apigee_openbank_kickstart/src/js/apigee-openbank-psuoauth.script.js */"./src/js/apigee-openbank-psuoauth.script.js");
+module.exports = __webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee_devportal_openbank_kickstart/themes/custom/apigee_openbank_kickstart/src/sass/apigee-openbank-kickstart.style.scss */"./src/sass/apigee-openbank-kickstart.style.scss");
 
 
 /***/ })

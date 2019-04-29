@@ -12,7 +12,10 @@ dependencies:
     - apigee_edge_apidocs
     - file
     - media_library
+<<<<<<< HEAD
+=======
     - metatag
+>>>>>>> 8.x-1.x
     - path
     - text
     - votingapi_widgets
@@ -50,11 +53,14 @@ content:
   field_image:
     type: media_library_widget
     weight: 5
+<<<<<<< HEAD
+=======
     settings: {  }
     third_party_settings: {  }
     region: content
   field_location:
     weight: 7
+>>>>>>> 8.x-1.x
     settings: {  }
     third_party_settings: {  }
     type: options_select
@@ -88,7 +94,11 @@ content:
     third_party_settings: {  }
   path:
     type: path
+<<<<<<< HEAD
+    weight: 6
+=======
     weight: 8
+>>>>>>> 8.x-1.x
     region: content
     settings: {  }
     third_party_settings: {  }

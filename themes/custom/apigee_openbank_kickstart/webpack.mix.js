@@ -45,4 +45,4 @@ mix.sass('src/sass/apigee-openbank-kickstart.style.scss', 'css');
  | JS
  |--------------------------------------------------------------------------
  */
-mix.js('src/js/apigee-openbank-kickstart.script.js', 'js');
+mix.js(['src/js/apigee-openbank-kickstart.script.js', 'src/js/apigee-openbank-psuoauth.script.js'], 'js');

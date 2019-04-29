@@ -58,4 +58,8 @@ content:
 hidden:
   contact: true
   language: true
+<<<<<<< HEAD
   path: true
+=======
+  path: true
+>>>>>>> 8.x-1.x
