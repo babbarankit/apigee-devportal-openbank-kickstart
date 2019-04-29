@@ -15756,6 +15756,10 @@ small {
   }
 }
 
+.user-logged-in [data-drupal-link-system-path="user/register"] {
+  display: none;
+}
+
 .page__footer {
   font-size: 0.875rem;
 }

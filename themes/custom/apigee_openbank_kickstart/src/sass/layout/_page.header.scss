@@ -9,3 +9,6 @@
     }
   }
 }
+.user-logged-in [data-drupal-link-system-path="user/register"] {
+  display: none;
+}

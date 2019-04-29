@@ -17652,9 +17652,9 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee_devportal_openbank_kickstart/themes/custom/apigee_openbank_kickstart/src/js/apigee-openbank-kickstart.script.js */"./src/js/apigee-openbank-kickstart.script.js");
-__webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee_devportal_openbank_kickstart/themes/custom/apigee_openbank_kickstart/src/js/apigee-openbank-psuoauth.script.js */"./src/js/apigee-openbank-psuoauth.script.js");
-module.exports = __webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee_devportal_openbank_kickstart/themes/custom/apigee_openbank_kickstart/src/sass/apigee-openbank-kickstart.style.scss */"./src/sass/apigee-openbank-kickstart.style.scss");
+__webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee-devportal-openbank-kickstart/themes/custom/apigee_openbank_kickstart/src/js/apigee-openbank-kickstart.script.js */"./src/js/apigee-openbank-kickstart.script.js");
+__webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee-devportal-openbank-kickstart/themes/custom/apigee_openbank_kickstart/src/js/apigee-openbank-psuoauth.script.js */"./src/js/apigee-openbank-psuoauth.script.js");
+module.exports = __webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee-devportal-openbank-kickstart/themes/custom/apigee_openbank_kickstart/src/sass/apigee-openbank-kickstart.style.scss */"./src/sass/apigee-openbank-kickstart.style.scss");
 
 
 /***/ })
