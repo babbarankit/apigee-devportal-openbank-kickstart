@@ -17392,9 +17392,9 @@ __webpack_require__.r(__webpack_exports__);
     attach: function attach(context, settings) {
       var base_url = 'https://ankitbabbar-eval-test.apigee.net';
       var org = 'ankitbabbar-eval';
-      var accounts_smartdoc_name = 'accounts-apis-v1-0';
+      var accounts_smartdoc_name = 'accounts-apis-v1-0-1';
       var accounts_oauth_name = 'PSUOAuth2Security';
-      var payments_smartdoc_name = 'payments-apis-v1-0';
+      var payments_smartdoc_name = 'payments-apis-v1-0-1';
       var payments_oauth_name = 'PSUOAuth2Security';
       var client_id_accounts = drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.client_id;
       var client_secret_accounts = drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.client_secret;
@@ -17583,17 +17583,16 @@ __webpack_require__.r(__webpack_exports__);
 
       function openAuthWindow() {
         ResetAndCancel();
-        var jwt = $('#request-token').val();
+        var jwt = localStorage.getItem('scope') == "accounts";
         var authUrl = '';
 
-        if (localStorage.ccScope == "accounts") {
+        if (jwt == "accounts") {
           authUrl = "".concat(base_url, "/apis/v1.0/oauth/authorize?response_type=code&client_id=").concat(client_id_accounts, "&state=abcd1234&scope=openid accounts&redirect_uri=").concat(template_callback_accounts);
         } else {
           authUrl = "".concat(base_url, "/apis/v1.0/oauth/authorize?response_type=code&client_id=").concat(client_id_payments, "&state=abcd1234&scope=openid accounts&redirect_uri=").concat(template_callback_payments);
         }
 
         authUrl += "&request=".concat(jwt, "&nonce=").concat(localStorage.getItem('nonce'));
-        console.log('authUrl', authUrl);
         var oauth2Window = window.open(authUrl, "oauth2Window", "resizable=yes,scrollbars=yes,status=1,toolbar=1,height=500,width=500");
       }
 

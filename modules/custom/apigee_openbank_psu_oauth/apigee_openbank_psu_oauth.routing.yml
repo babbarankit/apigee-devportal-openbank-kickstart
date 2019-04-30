@@ -12,6 +12,14 @@ apigee_openbank_psu_oauth.get_jwt:
   path: '/apigee-openbank-psu-oauth/get-jwt'
   defaults:
     _controller: '\Drupal\apigee_openbank_psu_oauth\Controller\PSUOAuth2JWTController::getJWT'
-    _title: 'title'
+    _title: 'Get JWT'
+  requirements:
+    _permission: 'access content'
+
+apigee_openbank_psu_oauth.oauth2_callback:
+  path: '/oauth2-callback/{scope}'
+  defaults:
+    _controller: '\Drupal\apigee_openbank_psu_oauth\Controller\PSUOAuth2CallbackController::callback'
+    _title: 'OAuth2 Callback'
   requirements:
     _permission: 'access content'
