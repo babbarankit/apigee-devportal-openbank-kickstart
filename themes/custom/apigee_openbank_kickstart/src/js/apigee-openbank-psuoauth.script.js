@@ -4,25 +4,13 @@ import { Base64 } from 'js-base64';
 
 	Drupal.behaviors.generate_auth_token = {
 		attach: function(context, settings) {
-
-			var base_url = 'https://ankitbabbar-eval-test.apigee.net';
-			var org = 'ankitbabbar-eval';
-
-			var accounts_smartdoc_name = 'accounts-apis-v1-0-1';
-			var accounts_oauth_name = 'PSUOAuth2Security';
-
-			var payments_smartdoc_name = 'payments-apis-v1-0-1';
-			var payments_oauth_name = 'PSUOAuth2Security';
+			var base_url = drupalSettings.apigee_openbank_psu_oauth.base_url;
 
 			var client_id_accounts = drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.client_id;
-			var client_secret_accounts = drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.client_secret;
-
 			var client_id_payments = drupalSettings.apigee_openbank_psu_oauth.default_auth.payments.client_id;
-			var client_secret_payments = drupalSettings.apigee_openbank_psu_oauth.default_auth.payments.client_secret;
 
-			//var template_callback_accounts = `https://api.enterprise.apigee.com/v1/o/${org}/apimodels/${accounts_smartdoc_name}/templateauths/${accounts_oauth_name}/callback`;
-			var template_callback_accounts = 'http://localhost/oauth2-callback/accounts';
-			var template_callback_payments = `https://api.enterprise.apigee.com/v1/o/${org}/apimodels/${payments_smartdoc_name}/templateauths/${payments_oauth_name}/callback`;
+			var template_callback_accounts = `${location.origin}/oauth2-callback/accounts`;
+			var template_callback_payments = `${location.origin}/oauth2-callback/payments`;
 
 			var jose_header = `{
 				"alg": "RS256",
@@ -33,7 +21,7 @@ import { Base64 } from 'js-base64';
 				"crit": ["b64", "http://openbanking.org.uk/iat", "http://openbanking.org.uk/iss"]
 			}`;
 
-			var modalMarkup = `<div class="modal fade" id="authModal" tabindex="-1" role="dialog" aria-labelledby="authModalLabel" aria-hidden="true">
+			var authModal = `<div class="modal fade" id="authModal" tabindex="-1" role="dialog" aria-labelledby="authModalLabel" aria-hidden="true">
 				<div class="modal-dialog modal-dialog-centered" role="document">
 					<div class="modal-content">
 						<div class="modal-header">
@@ -64,7 +52,7 @@ import { Base64 } from 'js-base64';
 								</div>
 								<div class="form-group row justify-content-end mr-4">
 									<button type="button" class="btn btn-primary btn-send rounded-sm mr-2" data-dismiss="modal" style="font-size:.750rem;">Create Token</button>
-									<button type="button" class="btn btn-primary btn-cancel" data-dismiss="modal" style="font-size:.750rem;">Cancel</button>
+									<button type="button" class="btn btn-primary" data-dismiss="modal" style="font-size:.750rem;">Cancel</button>
 								</div>
 							</form>
 
@@ -134,7 +122,34 @@ import { Base64 } from 'js-base64';
 				</div>
 			</div>`;
 
-			$('body', context).once().append(modalMarkup);
+			var jwtModal = `<div class="modal fade" id="jwtModal" tabindex="-1" role="dialog" aria-labelledby="authModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h3 class="modal-title">Create JWT</h3>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<form class="create-jwt">
+								<div class="form-group row">
+									<label for="jwt-payload" class="col-sm-4">Payload</label>
+									<textarea id="jwt-payload" class="col-sm-7" cols="30" rows="13"></textarea>
+								</div>
+								<div class="form-group row justify-content-end mr-4">
+									<button type="button" class="btn btn-primary btn-send rounded-sm mr-2" data-dismiss="modal" style="font-size:.750rem;">Create</button>
+									<button type="button" class="btn btn-primary rounded-sm" data-dismiss="modal" style="font-size:.750rem;" >Cancel</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			`;
+
+			$('body', context).append(authModal);
+			$('body', context).append(jwtModal);
 
 			$('body', context).on('click', '.try-out__btn', function(event) {
 				event.preventDefault();
@@ -143,7 +158,14 @@ import { Base64 } from 'js-base64';
 				paramRows.each(function() {
 					var row = $(this);
 					if (row.data('paramName') == 'Authorization') {
-						row.find('.parameters-col_description').once().append('<a href="#" class="btn btn-sm authorize" data-toggle="modal" data-target="#authModal">Generate Token</a>');
+						row.find('.parameters-col_description').once().append('<a id="authBtn" href="#" class="btn btn-sm authorize" data-toggle="modal" data-target="#authModal">Generate Token</a>');
+
+						if (tryBtn.hasClass('cancel')) {
+							$('#authBtn').addClass('d-none');
+						}
+						else {
+							$('#authBtn').removeClass('d-none');
+						}
 
 						var file = $('.information-container .link').attr('href');
 						var methodType = $(this).parents('.opblock').find('.opblock-summary-method').text().toLowerCase();
@@ -161,7 +183,7 @@ import { Base64 } from 'js-base64';
 	
 							$('.btn-cancel').on('click', function() {
 								ResetAndCancel();
-							})
+							});
 	
 							$('.create-token .btn-send').on('click', function() {
 								var modalForm = $(this).closest('.modal-content').find('form');
@@ -205,6 +227,29 @@ import { Base64 } from 'js-base64';
 							$('.set-token .btn-send').on('click', createToken);
 						});
 					}
+					else if (row.data('paramName') == 'client_assertion') {
+						row.find('.parameters-col_description').once().append('<a id="jwtBtn" href="#" class="btn btn-lg ml-2 execute" data-toggle="modal" data-target="#jwtModal">Create JWT</a>');
+
+						if (tryBtn.hasClass('cancel')) {
+							$('#jwtBtn').addClass('d-none');
+						}
+						else {
+							$('#jwtBtn').removeClass('d-none');
+						}
+
+						var jwtScope = localStorage.getItem('scope') ? localStorage.getItem('scope') : 'accounts';
+						var jwtPayload = {
+							"iss": drupalSettings.apigee_openbank_psu_oauth.default_auth[jwtScope].client_id
+						};
+						$('.create-jwt #jwt-payload').val(JSON.stringify(jwtPayload));
+
+						$('.create-jwt .btn-send').on('click', function() {
+							var header = '{"alg": "RS256","expiresIn": "1h"}';
+							var payload = $('#jwt-payload').val();
+							var jwtResponse = getJsonWebToken(header, payload);
+							row.find('input[type="text"]').val(jwtResponse.jwt);
+						});
+					}
 				});
 			});
 
@@ -221,17 +266,16 @@ import { Base64 } from 'js-base64';
 				xhttp.onreadystatechange = function() {
 					if (this.readyState == 4 && this.status == 200) {
 						$('.spinner-border').addClass('d-none');
-			      var responseText = JSON.parse(this.responseText);
+						var responseText = JSON.parse(this.responseText);
 						localStorage.setItem('Authorization', `${responseText.token_type} ${responseText.access_token}`);
-			      createRequestPage();
-			    }
-			    else if(this.readyState == 4 ) {
+						createRequestPage();
+					}
+					else if(this.readyState == 4 ) {
 						ResetAndCancel();
-			    }
-			  };
+					}
+				};
 
-			  xhttp.send(params);
-
+				xhttp.send(params);
 			}
 
 			function createRequestPage() {
@@ -303,8 +347,6 @@ import { Base64 } from 'js-base64';
 			}
 
 			function accessTokenPage() {
-				console.log('accessTokenPage');
-
 				$('#authModal').find('.create-request').addClass('hidden');
 				$('#authModal').find('.authorise-request').removeClass('hidden');
 				$('#authModal').find('.modal-title').text('Step 3: Set additional Parameters for getting Access Token');
@@ -333,7 +375,7 @@ import { Base64 } from 'js-base64';
 				}
 
 				authUrl += `&request=${jwt}&nonce=${localStorage.getItem('nonce')}`;
-				var oauth2Window = window.open(authUrl, "oauth2Window", "resizable=yes,scrollbars=yes,status=1,toolbar=1,height=500,width=500");
+				window.open(authUrl, "oauth2Window", "resizable=yes,scrollbars=yes,status=1,toolbar=1,height=500,width=500");
 			}
 
 			function getJWS(header, payload) {

@@ -27,6 +27,7 @@ class PSUOAuth2CallbackController extends ControllerBase {
           'apigee_openbank_oauth_callback' => [
             'code' => $code,
             'scope' => $scope,
+            'base_url' => 'https://ankitbabbar-eval-test.apigee.net',
           ]
         ],
       ],
