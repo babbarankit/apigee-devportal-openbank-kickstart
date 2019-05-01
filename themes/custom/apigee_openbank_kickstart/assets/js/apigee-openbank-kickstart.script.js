@@ -17399,8 +17399,9 @@ __webpack_require__.r(__webpack_exports__);
       var client_id_accounts = drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.client_id;
       var client_secret_accounts = drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.client_secret;
       var client_id_payments = drupalSettings.apigee_openbank_psu_oauth.default_auth.payments.client_id;
-      var client_secret_payments = drupalSettings.apigee_openbank_psu_oauth.default_auth.payments.client_secret;
-      var template_callback_accounts = "https://api.enterprise.apigee.com/v1/o/".concat(org, "/apimodels/").concat(accounts_smartdoc_name, "/templateauths/").concat(accounts_oauth_name, "/callback");
+      var client_secret_payments = drupalSettings.apigee_openbank_psu_oauth.default_auth.payments.client_secret; //var template_callback_accounts = `https://api.enterprise.apigee.com/v1/o/${org}/apimodels/${accounts_smartdoc_name}/templateauths/${accounts_oauth_name}/callback`;
+
+      var template_callback_accounts = 'http://localhost/oauth2-callback/accounts';
       var template_callback_payments = "https://api.enterprise.apigee.com/v1/o/".concat(org, "/apimodels/").concat(payments_smartdoc_name, "/templateauths/").concat(payments_oauth_name, "/callback");
       var jose_header = "{\n\t\t\t\t\"alg\": \"RS256\",\n\t\t\t\t\"kid\": \"".concat(drupalSettings.apigee_openbank_psu_oauth.private_key_certificate_id, "\",\n\t\t\t\t\"b64\": \"false\",\n\t\t\t\t\"http://openbanking.org.uk/iat\": \"2017-06-12T20:05:50 00:00\",\n\t\t\t\t\"http://openbanking.org.uk/iss\": \"C=UK, ST=England, L=London, O=Acme Ltd.\",\n\t\t\t\t\"crit\": [\"b64\", \"http://openbanking.org.uk/iat\", \"http://openbanking.org.uk/iss\"]\n\t\t\t}");
       var modalMarkup = "<div class=\"modal fade\" id=\"authModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"authModalLabel\" aria-hidden=\"true\">\n\t\t\t\t<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">\n\t\t\t\t\t<div class=\"modal-content\">\n\t\t\t\t\t\t<div class=\"modal-header\">\n\t\t\t\t\t\t\t<h3 class=\"modal-title\">Create Authorization Token</h3>\n\t\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\n\t\t\t\t\t\t\t\t<span aria-hidden=\"true\">&times;</span>\n\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"modal-body\">\n\t\t\t\t\t\t\t<form class=\"create-token\">\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<label for=\"scopes\">Scope</label>\n\t\t\t\t\t\t\t\t\t<select class=\"form-control\" id=\"scopes\">\n\t\t\t\t\t\t\t\t\t\t<option value=\"accounts\">Accounts</option>\n\t\t\t\t\t\t\t\t\t\t<option value=\"payments\">Payments</option>\n\t\t\t\t\t\t\t\t\t</select>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<label><input type=\"checkbox\" name=\"default-token\" id=\"default-token\"> Use default</label>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group client-info\">\n\t\t\t\t\t\t\t\t\t<label for=\"client-id\">Custom Client Id</label>\n\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" id=\"client-id\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group client-info\">\n\t\t\t\t\t\t\t\t\t<label for=\"client-secret\">Custom Client Secret</label>\n\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control\" id=\"client-secret\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row justify-content-end mr-4\">\n\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-send rounded-sm mr-2\" data-dismiss=\"modal\" style=\"font-size:.750rem;\">Create Token</button>\n\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-cancel\" data-dismiss=\"modal\" style=\"font-size:.750rem;\">Cancel</button>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</form>\n\n\t\t\t\t\t\t\t<form class=\"set-token hidden\">\n\t\t\t\t\t\t\t\t<div class=\"form-group row\">\n\t\t\t\t\t\t\t\t\t<label for=\"authorization\" class=\"col-sm-4\">Authorization</label>\n\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control col-sm-7\" id=\"authorization\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row\">\n\t\t\t\t\t\t\t\t\t<label for=\"grant-type\" class=\"col-sm-4\">Grant Type</label>\n\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control col-sm-7\" id=\"grant-type\" value=\"client_credentials\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row\">\n\t\t\t\t\t\t\t\t\t<label for=\"scopes\" class=\"col-sm-4\">Scope</label>\n\t\t\t\t\t\t\t\t\t<select class=\"form-control col-sm-7\" id=\"scope-type\">\n\t\t\t\t\t\t\t\t\t\t<option value=\"accounts\">Accounts</option>\n\t\t\t\t\t\t\t\t\t\t<option value=\"payments\">Payments</option>\n\t\t\t\t\t\t\t\t\t</select>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row justify-content-end mr-4\">\n\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-send rounded-sm mr-2\" style=\"font-size:.750rem;\">Send</button>\n\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-cancel rounded-sm\" data-dismiss=\"modal\" style=\"font-size:.750rem;\">Cancel</button>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</form>\n\n\t\t\t\t\t\t\t<form class=\"create-request hidden\">\n\t\t\t\t\t\t\t\t<div class=\"form-group row\">\n\t\t\t\t\t\t\t\t\t<label for=\"bearer-token\" class=\"col-sm-4\">Authorization</label>\n\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control col-sm-7\" id=\"bearer-token\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row\">\n\t\t\t\t\t\t\t\t\t<label for=\"financial-id\" class=\"col-sm-4\">x-fapi-financial-id</label>\n\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control col-sm-7\" id=\"financial-id\" value=\"123456789\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row d-none\">\n\t\t\t\t\t\t\t\t\t<label for=\"idempotency-key\" class=\"col-sm-4\">x-idempotency-key</label>\n\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control col-sm-7\" id=\"idempotency-key\" value=\"123456789\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row\">\n\t\t\t\t\t\t\t\t\t<label for=\"req-payload\" class=\"col-sm-4\">body</label>\n\t\t\t\t\t\t\t\t\t<textarea id=\"req-payload\" class=\"col-sm-7\" cols=\"30\" rows=\"13\"></textarea>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row justify-content-end mr-4\">\n\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-send rounded-sm mr-2\" style=\"font-size:.750rem;\">Send</button>\n\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-cancel rounded-sm\" data-dismiss=\"modal\" style=\"font-size:.750rem;\">Cancel</button>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</form>\n\n\t\t\t\t\t\t\t<form class=\"authorise-request hidden\">\n\t\t\t\t\t\t\t\t<div class=\"form-group row\">\n\t\t\t\t\t\t\t\t\t<label for=\"request-token\" class=\"col-sm-4\">request</label>\n\t\t\t\t\t\t\t\t\t<input type=\"text\" class=\"form-control col-sm-7\" id=\"request-token\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group row justify-content-end mr-4\">\n\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-send rounded-sm mr-2\" data-dismiss=\"modal\" style=\"font-size:.750rem;\">Send</button>\n\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-cancel rounded-sm\" data-dismiss=\"modal\" style=\"font-size:.750rem;\" >Cancel</button>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</form>\n\n\t\t\t\t\t\t\t<div class=\"d-flex justify-content-center\">\n\t\t\t\t\t\t\t\t<div class=\"spinner-border d-none\" style=\"width: 3rem; height: 3rem;\" role=\"status\">\n\t\t\t\t\t\t\t\t\t<span class=\"sr-only\">Loading...</span>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>";
@@ -17414,68 +17415,67 @@ __webpack_require__.r(__webpack_exports__);
 
           if (row.data('paramName') == 'Authorization') {
             row.find('.parameters-col_description').once().append('<a href="#" class="btn btn-sm authorize" data-toggle="modal" data-target="#authModal">Generate Token</a>');
-          }
+            var file = $('.information-container .link').attr('href');
+            var methodType = $(this).parents('.opblock').find('.opblock-summary-method').text().toLowerCase();
+            var methodPath = $(this).parents('.opblock').find('.opblock-summary-path').data('path');
+            $.getJSON(file, function (data) {
+              var method = data.paths[methodPath];
 
-          var file = $('.information-container .link').attr('href');
-          var methodType = $(this).parents('.opblock').find('.opblock-summary-method').text().toLowerCase();
-          var methodPath = $(this).parents('.opblock').find('.opblock-summary-path').data('path');
-          $.getJSON(file, function (data) {
-            var method = data.paths[methodPath];
-
-            if (method[methodType].security.length) {
-              var authToken = localStorage.getItem('token') ? localStorage.getItem('token') : drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.token;
-              $('#authModal').find('.create-token').addClass('hidden');
-              $('#authModal').find('.set-token').removeClass('hidden');
-              $('#authModal').find('.modal-title').text('Step 1: Get Client Credential Access Token');
-              $('.set-token').find('#authorization').val(authToken);
-            }
-
-            $('.btn-cancel').on('click', function () {
-              ResetAndCancel();
-            });
-            $('.create-token .btn-send').on('click', function () {
-              var modalForm = $(this).closest('.modal-content').find('form');
-              var defaultAuthToken = drupalSettings.apigee_openbank_psu_oauth.default_auth;
-              var scope = modalForm.find('#scopes').val();
-              var defaultToken = modalForm.find('#default-token').is(':checked');
-              var clientId = modalForm.find('#client-id').val();
-              var clientSecret = modalForm.find('#client-secret').val();
-              var token = "".concat(clientId, ":").concat(clientSecret);
-              var base64Encoded = js_base64__WEBPACK_IMPORTED_MODULE_0__["Base64"].encode(token);
-
-              if (row.data('paramName') == 'scope') {
-                row.find('select').val(scope);
+              if (method[methodType].security.length) {
+                var authToken = localStorage.getItem('token') ? localStorage.getItem('token') : drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.token;
+                $('#authModal').find('.create-token').addClass('hidden');
+                $('#authModal').find('.set-token').removeClass('hidden');
+                $('#authModal').find('.modal-title').text('Step 1: Get Client Credential Access Token');
+                $('.set-token').find('#authorization').val(authToken);
               }
 
-              if (row.data('paramName') == 'Authorization') {
-                if (defaultToken) {
-                  row.find('input[type="text"]').val(defaultAuthToken[scope].token);
-                  localStorage.setItem('token', defaultAuthToken[scope].token);
-                } else {
-                  row.find('input[type="text"]').val(base64Encoded);
-                  localStorage.setItem('token', base64Encoded);
+              $('.btn-cancel').on('click', function () {
+                ResetAndCancel();
+              });
+              $('.create-token .btn-send').on('click', function () {
+                var modalForm = $(this).closest('.modal-content').find('form');
+                var defaultAuthToken = drupalSettings.apigee_openbank_psu_oauth.default_auth;
+                var scope = modalForm.find('#scopes').val();
+                var defaultToken = modalForm.find('#default-token').is(':checked');
+                var clientId = modalForm.find('#client-id').val();
+                var clientSecret = modalForm.find('#client-secret').val();
+                var token = "".concat(clientId, ":").concat(clientSecret);
+                var base64Encoded = js_base64__WEBPACK_IMPORTED_MODULE_0__["Base64"].encode(token);
+
+                if (row.data('paramName') == 'scope') {
+                  row.find('select').val(scope);
                 }
-              }
+
+                if (row.data('paramName') == 'Authorization') {
+                  if (defaultToken) {
+                    row.find('input[type="text"]').val(defaultAuthToken[scope].token);
+                    localStorage.setItem('token', defaultAuthToken[scope].token);
+                  } else {
+                    row.find('input[type="text"]').val(base64Encoded);
+                    localStorage.setItem('token', base64Encoded);
+                  }
+                }
+              });
+              $('#authModal').find('#default-token').on('change', function () {
+                if ($(this).is(':checked')) {
+                  $(this).closest('.form-group').siblings('.client-info').addClass('hidden');
+                } else {
+                  $(this).closest('.form-group').siblings('.client-info').removeClass('hidden');
+                }
+              });
+              $('.set-token').find('#scope-type').on('change', function () {
+                $('.set-token').find('#authorization').val(drupalSettings.apigee_openbank_psu_oauth.default_auth[$(this).val()].token);
+              });
+              $('.set-token .btn-send').on('click', createToken);
             });
-            $('#authModal').find('#default-token').on('change', function () {
-              if ($(this).is(':checked')) {
-                $(this).closest('.form-group').siblings('.client-info').addClass('hidden');
-              } else {
-                $(this).closest('.form-group').siblings('.client-info').removeClass('hidden');
-              }
-            });
-            $('.set-token').find('#scope-type').on('change', function () {
-              $('.set-token').find('#authorization').val(drupalSettings.apigee_openbank_psu_oauth.default_auth[$(this).val()].token);
-            });
-            $('.set-token .btn-send').on('click', createToken);
-          });
+          }
         });
       });
 
       function createToken() {
         $('.spinner-border').removeClass('d-none');
         localStorage.setItem('scope', $('.set-token select').val());
-        var oauthURL = "".concat(base_url, "//apis/v1.0.1/oauth/token");
+        var oauthURL = "".concat(base_url, "/apis/v1.0.1/oauth/token");
         var xhttp = new XMLHttpRequest();
         xhttp.open("POST", oauthURL, true);
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -17583,13 +17583,13 @@ __webpack_require__.r(__webpack_exports__);
 
       function openAuthWindow() {
         ResetAndCancel();
-        var jwt = localStorage.getItem('scope') == "accounts";
+        var jwt = $('#request-token').val();
         var authUrl = '';
 
-        if (jwt == "accounts") {
-          authUrl = "".concat(base_url, "/apis/v1.0/oauth/authorize?response_type=code&client_id=").concat(client_id_accounts, "&state=abcd1234&scope=openid accounts&redirect_uri=").concat(template_callback_accounts);
+        if (localStorage.getItem('scope') == 'accounts') {
+          authUrl = "".concat(base_url, "/apis/v1.0.1/oauth/authorize?response_type=code&client_id=").concat(client_id_accounts, "&state=abcd1234&scope=openid accounts&redirect_uri=").concat(template_callback_accounts);
         } else {
-          authUrl = "".concat(base_url, "/apis/v1.0/oauth/authorize?response_type=code&client_id=").concat(client_id_payments, "&state=abcd1234&scope=openid accounts&redirect_uri=").concat(template_callback_payments);
+          authUrl = "".concat(base_url, "/apis/v1.0.1/oauth/authorize?response_type=code&client_id=").concat(client_id_payments, "&state=abcd1234&scope=openid accounts&redirect_uri=").concat(template_callback_payments);
         }
 
         authUrl += "&request=".concat(jwt, "&nonce=").concat(localStorage.getItem('nonce'));
@@ -17651,9 +17651,9 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee-devportal-openbank-kickstart/themes/custom/apigee_openbank_kickstart/src/js/apigee-openbank-kickstart.script.js */"./src/js/apigee-openbank-kickstart.script.js");
-__webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee-devportal-openbank-kickstart/themes/custom/apigee_openbank_kickstart/src/js/apigee-openbank-psuoauth.script.js */"./src/js/apigee-openbank-psuoauth.script.js");
-module.exports = __webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee-devportal-openbank-kickstart/themes/custom/apigee_openbank_kickstart/src/sass/apigee-openbank-kickstart.style.scss */"./src/sass/apigee-openbank-kickstart.style.scss");
+__webpack_require__(/*! /Users/haneetsingh/Sites/Srijan/apigee-devportal/web/profiles/contrib/apigee-devportal-openbank-kickstart/themes/custom/apigee_openbank_kickstart/src/js/apigee-openbank-kickstart.script.js */"./src/js/apigee-openbank-kickstart.script.js");
+__webpack_require__(/*! /Users/haneetsingh/Sites/Srijan/apigee-devportal/web/profiles/contrib/apigee-devportal-openbank-kickstart/themes/custom/apigee_openbank_kickstart/src/js/apigee-openbank-psuoauth.script.js */"./src/js/apigee-openbank-psuoauth.script.js");
+module.exports = __webpack_require__(/*! /Users/haneetsingh/Sites/Srijan/apigee-devportal/web/profiles/contrib/apigee-devportal-openbank-kickstart/themes/custom/apigee_openbank_kickstart/src/sass/apigee-openbank-kickstart.style.scss */"./src/sass/apigee-openbank-kickstart.style.scss");
 
 
 /***/ })

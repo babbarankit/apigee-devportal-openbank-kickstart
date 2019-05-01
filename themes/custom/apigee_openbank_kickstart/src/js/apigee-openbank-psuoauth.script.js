@@ -20,7 +20,8 @@ import { Base64 } from 'js-base64';
 			var client_id_payments = drupalSettings.apigee_openbank_psu_oauth.default_auth.payments.client_id;
 			var client_secret_payments = drupalSettings.apigee_openbank_psu_oauth.default_auth.payments.client_secret;
 
-			var template_callback_accounts = `https://api.enterprise.apigee.com/v1/o/${org}/apimodels/${accounts_smartdoc_name}/templateauths/${accounts_oauth_name}/callback`;
+			//var template_callback_accounts = `https://api.enterprise.apigee.com/v1/o/${org}/apimodels/${accounts_smartdoc_name}/templateauths/${accounts_oauth_name}/callback`;
+			var template_callback_accounts = 'http://localhost/oauth2-callback/accounts';
 			var template_callback_payments = `https://api.enterprise.apigee.com/v1/o/${org}/apimodels/${payments_smartdoc_name}/templateauths/${payments_oauth_name}/callback`;
 
 			var jose_header = `{
@@ -143,74 +144,74 @@ import { Base64 } from 'js-base64';
 					var row = $(this);
 					if (row.data('paramName') == 'Authorization') {
 						row.find('.parameters-col_description').once().append('<a href="#" class="btn btn-sm authorize" data-toggle="modal" data-target="#authModal">Generate Token</a>');
-					}
 
-					var file = $('.information-container .link').attr('href');
-					var methodType = $(this).parents('.opblock').find('.opblock-summary-method').text().toLowerCase();
-					var methodPath = $(this).parents('.opblock').find('.opblock-summary-path').data('path');
-					$.getJSON(file, function(data) {
-						var method = data.paths[methodPath];
-
-						if (method[methodType].security.length) {
-							var authToken = localStorage.getItem('token') ? localStorage.getItem('token') : drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.token;
-							$('#authModal').find('.create-token').addClass('hidden');
-							$('#authModal').find('.set-token').removeClass('hidden');
-							$('#authModal').find('.modal-title').text('Step 1: Get Client Credential Access Token');
-							$('.set-token').find('#authorization').val(authToken);
-						}
-
-						$('.btn-cancel').on('click', function() {
-							ResetAndCancel();
-						})
-
-						$('.create-token .btn-send').on('click', function() {
-							var modalForm = $(this).closest('.modal-content').find('form');
-							var defaultAuthToken = drupalSettings.apigee_openbank_psu_oauth.default_auth;
-							var scope = modalForm.find('#scopes').val();
-							var defaultToken = modalForm.find('#default-token').is(':checked');
-							var clientId = modalForm.find('#client-id').val();
-							var clientSecret = modalForm.find('#client-secret').val();
-							var token = `${clientId}:${clientSecret}`;
-							var base64Encoded = Base64.encode(token);
-
-							if (row.data('paramName') == 'scope') {
-								row.find('select').val(scope);
+						var file = $('.information-container .link').attr('href');
+						var methodType = $(this).parents('.opblock').find('.opblock-summary-method').text().toLowerCase();
+						var methodPath = $(this).parents('.opblock').find('.opblock-summary-path').data('path');
+						$.getJSON(file, function(data) {
+							var method = data.paths[methodPath];
+	
+							if (method[methodType].security.length) {
+								var authToken = localStorage.getItem('token') ? localStorage.getItem('token') : drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.token;
+								$('#authModal').find('.create-token').addClass('hidden');
+								$('#authModal').find('.set-token').removeClass('hidden');
+								$('#authModal').find('.modal-title').text('Step 1: Get Client Credential Access Token');
+								$('.set-token').find('#authorization').val(authToken);
 							}
-
-							if (row.data('paramName') == 'Authorization') {
-								if (defaultToken) {
-									row.find('input[type="text"]').val(defaultAuthToken[scope].token);
-									localStorage.setItem('token', defaultAuthToken[scope].token);
+	
+							$('.btn-cancel').on('click', function() {
+								ResetAndCancel();
+							})
+	
+							$('.create-token .btn-send').on('click', function() {
+								var modalForm = $(this).closest('.modal-content').find('form');
+								var defaultAuthToken = drupalSettings.apigee_openbank_psu_oauth.default_auth;
+								var scope = modalForm.find('#scopes').val();
+								var defaultToken = modalForm.find('#default-token').is(':checked');
+								var clientId = modalForm.find('#client-id').val();
+								var clientSecret = modalForm.find('#client-secret').val();
+								var token = `${clientId}:${clientSecret}`;
+								var base64Encoded = Base64.encode(token);
+	
+								if (row.data('paramName') == 'scope') {
+									row.find('select').val(scope);
+								}
+	
+								if (row.data('paramName') == 'Authorization') {
+									if (defaultToken) {
+										row.find('input[type="text"]').val(defaultAuthToken[scope].token);
+										localStorage.setItem('token', defaultAuthToken[scope].token);
+									}
+									else {
+										row.find('input[type="text"]').val(base64Encoded);
+										localStorage.setItem('token', base64Encoded);
+									}
+								}
+							});
+	
+							$('#authModal').find('#default-token').on('change', function() {
+								if ($(this).is(':checked')) {
+									$(this).closest('.form-group').siblings('.client-info').addClass('hidden');
 								}
 								else {
-									row.find('input[type="text"]').val(base64Encoded);
-									localStorage.setItem('token', base64Encoded);
+									$(this).closest('.form-group').siblings('.client-info').removeClass('hidden');
 								}
-							}
+							});
+	
+							$('.set-token').find('#scope-type').on('change', function() {
+								$('.set-token').find('#authorization').val(drupalSettings.apigee_openbank_psu_oauth.default_auth[$(this).val()].token);
+							});
+	
+							$('.set-token .btn-send').on('click', createToken);
 						});
-
-						$('#authModal').find('#default-token').on('change', function() {
-							if ($(this).is(':checked')) {
-								$(this).closest('.form-group').siblings('.client-info').addClass('hidden');
-							}
-							else {
-								$(this).closest('.form-group').siblings('.client-info').removeClass('hidden');
-							}
-						});
-
-						$('.set-token').find('#scope-type').on('change', function() {
-							$('.set-token').find('#authorization').val(drupalSettings.apigee_openbank_psu_oauth.default_auth[$(this).val()].token);
-						});
-
-						$('.set-token .btn-send').on('click', createToken);
-					});
+					}
 				});
 			});
 
 			function createToken() {
 				$('.spinner-border').removeClass('d-none');
 				localStorage.setItem('scope', $('.set-token select').val());
-				var oauthURL = `${base_url}//apis/v1.0.1/oauth/token`;
+				var oauthURL = `${base_url}/apis/v1.0.1/oauth/token`;
 				var xhttp = new XMLHttpRequest();
 				xhttp.open("POST", oauthURL, true);
 				xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -322,13 +323,13 @@ import { Base64 } from 'js-base64';
 
 			function openAuthWindow() {
 				ResetAndCancel();
-				var jwt = localStorage.getItem('scope') == "accounts";
+				var jwt = $('#request-token').val();
 				var authUrl = '';
-				if (jwt == "accounts") {
-					authUrl = `${base_url}/apis/v1.0/oauth/authorize?response_type=code&client_id=${client_id_accounts}&state=abcd1234&scope=openid accounts&redirect_uri=${template_callback_accounts}`;
+				if (localStorage.getItem('scope') == 'accounts') {
+					authUrl = `${base_url}/apis/v1.0.1/oauth/authorize?response_type=code&client_id=${client_id_accounts}&state=abcd1234&scope=openid accounts&redirect_uri=${template_callback_accounts}`;
 				}
 				else {
-					authUrl = `${base_url}/apis/v1.0/oauth/authorize?response_type=code&client_id=${client_id_payments}&state=abcd1234&scope=openid accounts&redirect_uri=${template_callback_payments}`;
+					authUrl = `${base_url}/apis/v1.0.1/oauth/authorize?response_type=code&client_id=${client_id_payments}&state=abcd1234&scope=openid accounts&redirect_uri=${template_callback_payments}`;
 				}
 
 				authUrl += `&request=${jwt}&nonce=${localStorage.getItem('nonce')}`;
