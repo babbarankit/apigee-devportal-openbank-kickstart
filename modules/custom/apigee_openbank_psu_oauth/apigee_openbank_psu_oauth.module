@@ -23,5 +23,6 @@ function apigee_openbank_psu_oauth_preprocess_html(&$variables) {
   $variables['#attached']['drupalSettings']['apigee_openbank_psu_oauth'] = [
     'default_auth' => $settings,
     'private_key_certificate_id' => $private_key_certificate_id,
+    'base_url' => 'https://ankitbabbar-eval-test.apigee.net',
   ];
 }

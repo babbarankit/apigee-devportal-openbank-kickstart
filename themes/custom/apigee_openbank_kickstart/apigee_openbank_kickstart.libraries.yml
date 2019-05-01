@@ -9,6 +9,14 @@ style:
     - core/jquery
     - core/drupal
 
+apigee-psu:
+  version: 1.x
+  js:
+    js/apigee-psu.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings 
+
 font.roboto:
   version: VERSION
   license:

@@ -1,7 +1,7 @@
-apigee-psu:
+apigee-oauth-callback:
   version: 1.x
   js:
-    js/apigee-psu.js: {}
+    js/apigee-oauth-callback.js: {}
   dependencies:
     - core/jquery
     - core/drupalSettings
