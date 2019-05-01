@@ -5,3 +5,20 @@
 .wrapper--secondary {
   width: auto;
 }
+.carousel-caption {
+  h5 {
+    font-size: 2rem;
+  }
+}
+.api-page .api-card {
+  background: #f2f2f2;
+}
+.api-page .views-exposed-form {
+  .card {
+    border: #f2f2f2 1px solid;
+  }
+  .card-body {
+    background: #f2f2f2 !important;
+    padding-top: 1.5rem !important;
+  }
+}
