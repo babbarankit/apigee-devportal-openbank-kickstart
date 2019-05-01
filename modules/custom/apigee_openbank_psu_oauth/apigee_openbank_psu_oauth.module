@@ -1,4 +1,12 @@
 <?php
+
+/**
+ * @file
+ */
+
+/**
+ *
+ */
 function apigee_openbank_psu_oauth_preprocess_html(&$variables) {
   $config = \Drupal::config('apigee_openbank_psu_oauth.openbanksettings');
   $accounts_client_id = $config->get('accounts_client_id');
@@ -10,15 +18,15 @@ function apigee_openbank_psu_oauth_preprocess_html(&$variables) {
   $private_key_certificate_id = $config->get('private_key_certificate_id');
   $settings = [
     'accounts' => [
-			'client_id' => $accounts_client_id,
-			'client_secret' => $accounts_client_secret,
-			'token' => $accounts_auth,
-		],
+      'client_id' => $accounts_client_id,
+      'client_secret' => $accounts_client_secret,
+      'token' => $accounts_auth,
+    ],
     'payments' => [
-			'client_id' => $payments_client_id,
-			'client_secret' => $payments_client_secret,
-			'token' => $payments_auth,
-		],
+      'client_id' => $payments_client_id,
+      'client_secret' => $payments_client_secret,
+      'token' => $payments_auth,
+    ],
   ];
   $variables['#attached']['drupalSettings']['apigee_openbank_psu_oauth'] = [
     'default_auth' => $settings,

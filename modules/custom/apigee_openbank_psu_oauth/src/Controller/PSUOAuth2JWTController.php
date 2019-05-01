@@ -1,11 +1,13 @@
 <?php
 
 namespace Drupal\apigee_openbank_psu_oauth\Controller;
+
 use Symfony\Component\HttpFoundation\RequestStack;
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+
 /**
  * Class PSUOAuth2JWTController.
  */
@@ -14,14 +16,14 @@ class PSUOAuth2JWTController extends ControllerBase {
   /**
    * Request stack.
    *
-   * @var RequestStack
+   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
   public $request;
 
   /**
    * Class constructor.
    *
-   * @param RequestStack $request
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request
    *   Request stack.
    */
   public function __construct(RequestStack $request) {
@@ -48,8 +50,8 @@ class PSUOAuth2JWTController extends ControllerBase {
   public function getJWT() {
     $header_str = $this->request->getCurrentRequest()->get('header');
     $payload_str = $this->request->getCurrentRequest()->get('payload');
-    $header = json_decode($header_str, false);
-    $payload = json_decode($payload_str, false);
+    $header = json_decode($header_str, FALSE);
+    $payload = json_decode($payload_str, FALSE);
     if (!$header || !$payload) {
       throw new HttpException(400, "Failed to generate");
     }
@@ -60,11 +62,17 @@ class PSUOAuth2JWTController extends ControllerBase {
     return new JsonResponse($jwt);
   }
 
+  /**
+   *
+   */
   private function base64UrlEncode($data) {
     return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
   }
 
-  private function generateJWT($algo, $header,  $payload,  $private_key_path) {
+  /**
+   *
+   */
+  private function generateJWT($algo, $header, $payload, $private_key_path) {
     $headerEncoded = $this->base64UrlEncode(json_encode($header));
 
     $payloadEncoded = $this->base64UrlEncode(json_encode($payload));
@@ -73,10 +81,9 @@ class PSUOAuth2JWTController extends ControllerBase {
     $dataEncoded = "$headerEncoded.$payloadEncoded";
     $private_key = openssl_pkey_get_private($private_key_path);
     $result = openssl_sign($dataEncoded, $signature, $private_key_path, $algo);
-    
-    if ($result === false)
-    {
-        throw new HttpException(500, "Failed to generate signature: ".implode("\n", getOpenSSLErrors()));
+
+    if ($result === FALSE) {
+      throw new HttpException(500, "Failed to generate signature: " . implode("\n", getOpenSSLErrors()));
     }
     $signatureEncoded = $this->base64UrlEncode($signature);
     $jwt = "$dataEncoded.$signatureEncoded";

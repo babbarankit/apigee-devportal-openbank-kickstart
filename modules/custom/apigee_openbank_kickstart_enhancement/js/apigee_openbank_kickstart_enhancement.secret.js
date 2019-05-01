@@ -1,4 +1,5 @@
-/*
+/**
+ * @file
  * Copyright 2018 Google Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -58,7 +59,8 @@
       // IE specific code path to prevent textarea being shown while dialog is visible.
       return clipboardData.setData("Text", text);
 
-    } else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
+    }
+else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
       var textarea = document.createElement("textarea");
       textarea.textContent = text;
       // Prevent scrolling to bottom of page in MS Edge.
@@ -68,7 +70,8 @@
       try {
         // Security exception may be thrown by some browsers.
         return document.execCommand("copy");
-      } catch (ex) {
+      }
+catch (ex) {
         return false;
       } finally {
         document.body.removeChild(textarea);
