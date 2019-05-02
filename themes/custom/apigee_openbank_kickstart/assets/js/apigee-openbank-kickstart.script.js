@@ -17423,7 +17423,7 @@ __webpack_require__.r(__webpack_exports__);
               var method = data.paths[methodPath];
 
               if (method[methodType].security.length) {
-                var authToken = localStorage.getItem('token') ? localStorage.getItem('token') : drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.token;
+                var authToken = drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.token;
                 $('#authModal').find('.create-token').addClass('hidden');
                 $('#authModal').find('.set-token').removeClass('hidden');
                 $('#authModal').find('.modal-title').text('Step 1: Get Client Credential Access Token');
