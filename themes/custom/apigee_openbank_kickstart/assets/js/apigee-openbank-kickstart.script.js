@@ -17423,7 +17423,7 @@ __webpack_require__.r(__webpack_exports__);
               var method = data.paths[methodPath];
 
               if (method[methodType].security.length) {
-                var authToken = localStorage.getItem('token') ? localStorage.getItem('token') : drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.token;
+                var authToken = drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.token;
                 $('#authModal').find('.create-token').addClass('hidden');
                 $('#authModal').find('.set-token').removeClass('hidden');
                 $('#authModal').find('.modal-title').text('Step 1: Get Client Credential Access Token');
@@ -17449,7 +17449,7 @@ __webpack_require__.r(__webpack_exports__);
 
                 if (row.data('paramName') == 'Authorization') {
                   if (defaultToken) {
-                    row.find('input[type="text"]').val(defaultAuthToken[scope].token);
+                    row.find('.markdown').append("<div class=\"alert alert-primary\">Copy the code to the input below<pre><code>".concat(defaultAuthToken[scope].token, "</code></pre></div>"));
                     localStorage.setItem('token', defaultAuthToken[scope].token);
                   } else {
                     row.find('input[type="text"]').val(base64Encoded);
@@ -17478,16 +17478,19 @@ __webpack_require__.r(__webpack_exports__);
               $('#jwtBtn').removeClass('d-none');
             }
 
-            var jwtScope = localStorage.getItem('scope') ? localStorage.getItem('scope') : 'accounts';
-            var jwtPayload = {
-              "iss": drupalSettings.apigee_openbank_psu_oauth.default_auth[jwtScope].client_id
-            };
-            $('.create-jwt #jwt-payload').val(JSON.stringify(jwtPayload));
+            var target = row.siblings('[data-param-name="client_id"]');
+            $('.create-jwt #jwt-payload').val('Enter client_id value in the given field');
+            target.on('change', 'input', function (event) {
+              var jwtPayload = {
+                "iss": event.target.value
+              };
+              $('.create-jwt #jwt-payload').val(JSON.stringify(jwtPayload));
+            });
             $('.create-jwt .btn-send').on('click', function () {
               var header = '{"alg": "RS256","expiresIn": "1h"}';
               var payload = $('#jwt-payload').val();
               var jwtResponse = getJsonWebToken(header, payload);
-              row.find('input[type="text"]').val(jwtResponse.jwt);
+              row.find('.markdown').append("<div class=\"alert alert-primary\">Copy the code to the input below <pre><code>".concat(jwtResponse.jwt, "</code></pre></div>"));
             });
           }
         });
@@ -17671,9 +17674,9 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee-devportal-openbank-kickstart/themes/custom/apigee_openbank_kickstart/src/js/apigee-openbank-kickstart.script.js */"./src/js/apigee-openbank-kickstart.script.js");
-__webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee-devportal-openbank-kickstart/themes/custom/apigee_openbank_kickstart/src/js/apigee-openbank-psuoauth.script.js */"./src/js/apigee-openbank-psuoauth.script.js");
-module.exports = __webpack_require__(/*! /Users/apple/src/devportal/web/profiles/contrib/apigee-devportal-openbank-kickstart/themes/custom/apigee_openbank_kickstart/src/sass/apigee-openbank-kickstart.style.scss */"./src/sass/apigee-openbank-kickstart.style.scss");
+__webpack_require__(/*! /Users/haneetsingh/Sites/Srijan/apigee-devportal/web/profiles/contrib/apigee-devportal-openbank-kickstart/themes/custom/apigee_openbank_kickstart/src/js/apigee-openbank-kickstart.script.js */"./src/js/apigee-openbank-kickstart.script.js");
+__webpack_require__(/*! /Users/haneetsingh/Sites/Srijan/apigee-devportal/web/profiles/contrib/apigee-devportal-openbank-kickstart/themes/custom/apigee_openbank_kickstart/src/js/apigee-openbank-psuoauth.script.js */"./src/js/apigee-openbank-psuoauth.script.js");
+module.exports = __webpack_require__(/*! /Users/haneetsingh/Sites/Srijan/apigee-devportal/web/profiles/contrib/apigee-devportal-openbank-kickstart/themes/custom/apigee_openbank_kickstart/src/sass/apigee-openbank-kickstart.style.scss */"./src/sass/apigee-openbank-kickstart.style.scss");
 
 
 /***/ })

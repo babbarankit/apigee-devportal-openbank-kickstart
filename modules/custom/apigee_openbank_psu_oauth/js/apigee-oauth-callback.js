@@ -20,7 +20,7 @@
 
       $.ajax({
         type: 'GET',
-        url: `http://localhost/apigee-openbank-psu-oauth/get-jwt?header=${JSON.stringify(jwtHeader)}&payload=${JSON.stringify(jwtPayload)}`,
+        url: `${location.origin}/apigee-openbank-psu-oauth/get-jwt?header=${JSON.stringify(jwtHeader)}&payload=${JSON.stringify(jwtPayload)}`,
         success: function(response) {
           if (response.jwt) {
             var jwt = response.jwt;
@@ -42,9 +42,10 @@
               },
               success: function(response) {
                 if (response.access_token) {
-                  window.close();
-                  var refererr = $(window.opener.document);
-                  refererr.find('.opblock.is-open tr[data-param-name="Authorization"] input').val(`Bearer ${response.access_token}`);
+									var refererr = $(window.opener.document);
+									var target = refererr.find('.opblock.is-open tr[data-param-name="Authorization"] .markdown');
+									target.append(`<div class="alert alert-primary">Copy the code to the input below <pre><code>Bearer ${response.access_token}</code></pre></div>`);
+									window.close();
                 }
               }
             });

@@ -172,19 +172,19 @@ import { Base64 } from 'js-base64';
 						var methodPath = $(this).parents('.opblock').find('.opblock-summary-path').data('path');
 						$.getJSON(file, function(data) {
 							var method = data.paths[methodPath];
-	
+
 							if (method[methodType].security.length) {
-								var authToken = localStorage.getItem('token') ? localStorage.getItem('token') : drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.token;
+								var authToken = drupalSettings.apigee_openbank_psu_oauth.default_auth.accounts.token;
 								$('#authModal').find('.create-token').addClass('hidden');
 								$('#authModal').find('.set-token').removeClass('hidden');
 								$('#authModal').find('.modal-title').text('Step 1: Get Client Credential Access Token');
 								$('.set-token').find('#authorization').val(authToken);
 							}
-	
+
 							$('.btn-cancel').on('click', function() {
 								ResetAndCancel();
 							});
-	
+
 							$('.create-token .btn-send').on('click', function() {
 								var modalForm = $(this).closest('.modal-content').find('form');
 								var defaultAuthToken = drupalSettings.apigee_openbank_psu_oauth.default_auth;
@@ -194,14 +194,14 @@ import { Base64 } from 'js-base64';
 								var clientSecret = modalForm.find('#client-secret').val();
 								var token = `${clientId}:${clientSecret}`;
 								var base64Encoded = Base64.encode(token);
-	
+
 								if (row.data('paramName') == 'scope') {
 									row.find('select').val(scope);
 								}
-	
+
 								if (row.data('paramName') == 'Authorization') {
 									if (defaultToken) {
-										row.find('input[type="text"]').val(defaultAuthToken[scope].token);
+										row.find('.markdown').append(`<div class="alert alert-primary">Copy the code to the input below<pre><code>${defaultAuthToken[scope].token}</code></pre></div>`);
 										localStorage.setItem('token', defaultAuthToken[scope].token);
 									}
 									else {
@@ -210,7 +210,7 @@ import { Base64 } from 'js-base64';
 									}
 								}
 							});
-	
+
 							$('#authModal').find('#default-token').on('change', function() {
 								if ($(this).is(':checked')) {
 									$(this).closest('.form-group').siblings('.client-info').addClass('hidden');
@@ -219,11 +219,11 @@ import { Base64 } from 'js-base64';
 									$(this).closest('.form-group').siblings('.client-info').removeClass('hidden');
 								}
 							});
-	
+
 							$('.set-token').find('#scope-type').on('change', function() {
 								$('.set-token').find('#authorization').val(drupalSettings.apigee_openbank_psu_oauth.default_auth[$(this).val()].token);
 							});
-	
+
 							$('.set-token .btn-send').on('click', createToken);
 						});
 					}
@@ -237,17 +237,20 @@ import { Base64 } from 'js-base64';
 							$('#jwtBtn').removeClass('d-none');
 						}
 
-						var jwtScope = localStorage.getItem('scope') ? localStorage.getItem('scope') : 'accounts';
-						var jwtPayload = {
-							"iss": drupalSettings.apigee_openbank_psu_oauth.default_auth[jwtScope].client_id
-						};
-						$('.create-jwt #jwt-payload').val(JSON.stringify(jwtPayload));
+						var target = row.siblings('[data-param-name="client_id"]');
+						$('.create-jwt #jwt-payload').val('Enter client_id value in the given field')
+						target.on('change', 'input', function(event) {
+							var jwtPayload = {
+								"iss": event.target.value
+							};
+							$('.create-jwt #jwt-payload').val(JSON.stringify(jwtPayload));
+						});
 
 						$('.create-jwt .btn-send').on('click', function() {
 							var header = '{"alg": "RS256","expiresIn": "1h"}';
 							var payload = $('#jwt-payload').val();
 							var jwtResponse = getJsonWebToken(header, payload);
-							row.find('input[type="text"]').val(jwtResponse.jwt);
+							row.find('.markdown').append(`<div class="alert alert-primary">Copy the code to the input below <pre><code>${jwtResponse.jwt}</code></pre></div>`);
 						});
 					}
 				});
